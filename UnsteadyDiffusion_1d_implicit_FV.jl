@@ -69,44 +69,44 @@ B = zeros(nx,1)
 B[1:nx-1] .= Tini
 B[nx] = Tini+2*Fo*TL
 
-T[1,:] .= Tini
+
 
 #remplissage matrice A
+A = zeros(nx, nx)
+for i = 1:nx
+    if i==1
+        A[i,i] = 1 + Fo
+        A[i,i+1] = -Fo
+    elseif i==nx
+        A[i,i] = 1+3*Fo
+        A[i,i-1] = -Fo
+    else
+        A[i,i] = 1+2*Fo
+        A[i, i-1] = -Fo
+        A[i, i+1] = -Fo
+    end
+end
 
-# for i = 1:nx
-#     if i==1
-#         A[i,i] = 1 + Fo
-#         A[i,i+1] = -Fo
-#     elseif i==nx
-#         A[i,i] = 1+3*Fo
-#         A[i,i-1] = -Fo
-#     else
-#         A[i,i] = 1+2*Fo
-#         A[i, i-1] = -Fo
-#         A[i, i+1] = -Fo
-#     end
-# end
-
-#Make tridiagMatrix A
-a1 = 1 + Fo
-aEnd = 1 + 3*Fo
-aN = 1 + 2*Fo
-b = - Fo
-A = maketridiag(a1,aEnd,aN,b,nx)
+# Make tridiagMatrix A
+# a1 = 1 + Fo
+# aEnd = 1 + 3*Fo
+# aN = 1 + 2*Fo
+# b = - Fo
+# A = maketridiag(a1,aEnd,aN,b,nx)
 
 #Fill T matrix and add boudaries conditions
 T = SolveT(nx, nt, A, B, Tini)
 T = Taugmented(T, Tini, TL, nt)
 
 t2 = time() - t1
-println("Elapsed time ", t2, " seconds")
+println("Elapsed time implicit : ", t2, " seconds")
 
 #Plot using PlotlyJS for interactivity
 x = dx/2:dx:L-dx/2
 x = vcat(0,x,L)
 
 t = 0 : dt : tf
-
+#Surface Plotting
 layout = Layout(
     title = "1D heat diffusion",
     scene = attr(
@@ -116,10 +116,29 @@ layout = Layout(
     )
 
 
-plot(surface(
+pltsurf = plot(surface(
     contours = attr(
         x=attr(show=true,start=0,size = dt*10),
         x_end=tf,
         y=attr(show=true,start=dx/2,size = dx),
         y_end =L), 
     z=T,x=t,y=x, colorscale = "Earth"),layout)
+
+
+
+# T1 = T[10,:]
+# T2 = T[20,:]
+# T3 = T[50,:]
+
+# layout = Layout(
+#     title = "Temperature profile : FD implicit",
+#     axis_title = "Position (m)",
+#     yaxis_title = "Température (°C)"
+# )
+
+# sctplt = plot([
+#     scatter(y = T1, x = x, mode = "markers+lines", name = "Numerical t=50s"),
+#     scatter(y = T2, x = x, mode = "markers+lines", name = "Numerical t=100s"),
+#     scatter(y = T3, x = x, mode = "markers+lines", name = "Numerical t=250s")
+#     ])
+

@@ -5,6 +5,34 @@
 
 using PlotlyJS
 
+function computeT(nt, nx, Tini)
+    T = zeros(nt,nx)
+    T[1,:] .= Tini
+    for i = 1:(nt-1)
+        for j = 1:nx
+            if j == 1
+                T[i+1,j] = Fo*T[i,j+1] + (1-Fo)*T[i,j]
+            elseif j==nx
+                T[i+1,j] = Fo*T[i, j-1] + (1-3*Fo)*T[i,j]+2*Fo*TL
+            else
+                T[i+1,j] = Fo*T[i,j+1] - (2*Fo-1)*T[i,j]+Fo*T[i,j-1]
+            end
+        end
+    end
+    return T
+end
+
+function Taugmented(T, init, TL, nt)
+    TleftB = zeros(nt, 1)
+    TleftB[1] = init
+    TleftB[2:nt,:] .= T[2:nt,1]
+    TrightB = zeros(nt,1)
+    TrightB[1] = init
+    TrightB[2:nt,:] .= TL
+    Taugmented = [TleftB T TrightB]
+    return Taugmented
+end
+
 rhocp = 1e7 #J/m^3/K
 k=10 #W/m/K
 a=k/rhocp #m^2/s
@@ -28,41 +56,15 @@ nt = 101
 dt = tf/(nt-1)
 
 Fo = a*dt/dx^2
-T = zeros(nt,nx)
 
 #Boundary conditions
 TL = 0
 
 #Initial conditions
 Tini = 200
-T[1,:] .= Tini
 
-
-for i = 1:(nt-1)
-    for j = 1:nx
-        if j == 1
-            T[i+1,j] = Fo*T[i,j+1] + (1-Fo)*T[i,j]
-        elseif j==nx
-            T[i+1,j] = Fo*T[i, j-1] + (1-3*Fo)*T[i,j]+2*Fo*TL
-        else
-            T[i+1,j] = Fo*T[i,j+1] - (2*Fo-1)*T[i,j]+Fo*T[i,j-1]
-        end
-    end
-end
-
-for h in eachindex(T)
-    println(h)
-end
-
-
-TleftB = zeros(nt, 1)
-TleftB[1] = Tini
-TleftB[2:nt,:] .= T[2:nt,1]
-TrightB = zeros(nt,1)
-TrightB[1] = Tini
-TrightB[2:nt,:] .= TL
-Taugmented = [TleftB T TrightB]
-
+T = computeT(nt, nx, Tini)
+Taug = Taugmented(T, Tini, TL, nt)
 
 #Plotting the results
 
@@ -85,5 +87,5 @@ plot(surface(
         x_end=tf,
         y=attr(show=true,start=dx/2,size = dx),
         y_end =L), 
-    z=T,x=t,y=x, colorscale = "Earth"),layout)
+    z=Taug,x=t,y=x, colorscale = "Earth"),layout)
 
