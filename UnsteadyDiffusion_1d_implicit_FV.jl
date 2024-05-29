@@ -37,7 +37,6 @@ function Taugmented(T, Tini, TL,nt)
     return Taugmented
 end
 
-t1 = time()
 #Problem : Backward Euler 1st order difference scheme
 rhocp = 1e7 #J/m3/K
 k = 10 #W/m/K
@@ -98,8 +97,6 @@ end
 T = SolveT(nx, nt, A, B, Tini)
 T = Taugmented(T, Tini, TL, nt)
 
-t2 = time() - t1
-println("Elapsed time implicit : ", t2, " seconds")
 
 #Plot using PlotlyJS for interactivity
 x = dx/2:dx:L-dx/2
@@ -126,19 +123,19 @@ pltsurf = plot(surface(
 
 
 
-# T1 = T[10,:]
-# T2 = T[20,:]
-# T3 = T[50,:]
+T1 = T[10,:]
+T2 = T[20,:]
+T3 = T[50,:]
 
-# layout = Layout(
-#     title = "Temperature profile : FD implicit",
-#     axis_title = "Position (m)",
-#     yaxis_title = "Température (°C)"
-# )
+layout = Layout(
+    title = "Temperature profile : FD implicit",
+    axis_title = "Position (m)",
+    yaxis_title = "Température (°C)"
+)
 
-# sctplt = plot([
-#     scatter(y = T1, x = x, mode = "markers+lines", name = "Numerical t=50s"),
-#     scatter(y = T2, x = x, mode = "markers+lines", name = "Numerical t=100s"),
-#     scatter(y = T3, x = x, mode = "markers+lines", name = "Numerical t=250s")
-#     ])
+sctplt = plot([
+    scatter(y = T1, x = x, mode = "markers+lines", name = "Numerical t=50s"),
+    scatter(y = T2, x = x, mode = "markers+lines", name = "Numerical t=100s"),
+    scatter(y = T3, x = x, mode = "markers+lines", name = "Numerical t=250s")
+    ])
 
