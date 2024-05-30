@@ -2,12 +2,12 @@
 #Author : Chrislain Coubard (adapted from Patrick Perre)
 #Date : 05/2024
 
-#Init values
+
 using PlotlyJS
 
 function UpdateValues!(n_glu, n_tot, mu_0, k_s, dt, ratio, rho_pop,  glu, pop, s_glu)
     for  i_x in (1+n_glu):n_tot
-        mu = (mu_0 * glu[i_x]) / (k_s + glu[i_x])
+        mu = mu_0 * glu[i_x] / (k_s + glu[i_x])
         d_pop = pop[i_x] * mu * dt
         pop[i_x] = pop[i_x] + d_pop
         s_glu[i_x] = -d_pop / ratio * rho_pop
@@ -47,6 +47,7 @@ function buildScatter(x, y, n_save)
     return plot(arr_traces)
 end
 
+#Init values
 n_glu = 100
 n_pop = 100
 L_glu = 1e-2
@@ -97,17 +98,11 @@ s_glu = zeros( n_tot)
 glu[1:n_glu] .= 10
 ind = [1,2,3,4,5] .+ n_glu 
 pop[ind] .= 1
-# traces_arr = []
-# p = plot(scatter(;x=x*1e3, y=glu, mode="line"))
-# push!(traces_arr,p)
-# addtraces(p1, scatter(x = (x2*1e3), y = glu), mode = "markers")
 
 
 
 for time_step in 1:n_save #save points
-    println("current step : $time_step")
     for i_inner in 1:n_inner #actual computation
-        # println("glu = $glu")
         UpdateValues!(n_glu, n_tot, mu_0, k_s, dt, ratio, rho_pop, glu, pop, s_glu)
         SmoothArr!(n_glu, n_tot, pop)
         UpdateD!(n_glu, n_tot, D_gl, D, pop)
@@ -119,24 +114,13 @@ for time_step in 1:n_save #save points
     time_save[time_step] = dt*time_step*n_inner/3600
 end
 
-# println("glu_save = ",glu_save[1])
-# for i in eachindex(glu_save)
-#     println("glu at time $i = ", glu_save[i])
-# end
-plot(scatter(;x = time_save,y= pop_save, mode = "markers"))
-# layout = Layout(xaxis_range = [0,10], yaxis_range = [0,10])
-# test = []
-# trace1 = scatter(;x=x*1e3, y = glu_save[1,:], mode = "line")
-# trace2 = scatter(;x=x*1e3, y = glu_save[20,:], mode = "line")
-# trace3 = scatter(;x=x*1e3, y = glu_save[10,:], mode = "line")
-# push!(test, trace1)
-# push!(test, trace2)
-# push!(test, trace3)
 
-# plot(test)
-# plot([trace1, trace2])
-# print("gone through succesfully")
-traces = Vector{GenericTrace}(undef, n_save)
-for i in 1:n_save
-    traces[i] = scatter(x = x*1e3, y = glu_save[i,:], mode = "line", name = "$i",line_color = "red")
-end
+
+plot(scatter(;x = time_save,y= pop_save, mode = "markers"))
+
+
+# traces = Vector{GenericTrace}(undef, n_save)
+# for i in 1:n_save
+#     traces[i] = scatter(x = x*1e3, y = glu_save[i,:], mode = "line", name = "$i",line_color = "red")
+# end
+# plot(traces)
