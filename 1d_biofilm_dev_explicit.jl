@@ -5,6 +5,48 @@
 #Init values
 using PlotlyJS
 
+function UpdateValues!(n_glu, n_tot, mu_0, k_s, dt, ratio, rho_pop,  glu, pop, s_glu)
+    for  i_x in (1+n_glu):n_tot
+        mu = (mu_0 * glu[i_x]) / (k_s + glu[i_x])
+        d_pop = pop[i_x] * mu * dt
+        pop[i_x] = pop[i_x] + d_pop
+        s_glu[i_x] = -d_pop / ratio * rho_pop
+    end
+end
+
+function SmoothArr!(n_glu, n_tot, pop)
+    for i_x in (1+n_glu):n_tot
+        if pop[i_x] > 1
+            pop[i_x+1] = pop[i_x+1] + pop[i_x] - 1
+            pop[i_x] = 1
+        end
+    end
+end
+
+function UpdateD!(n_glu, n_tot, D_gl, D, pop)
+    for i_x in (1+n_glu):n_tot
+        D[i_x] = D_gl * pop[i_x]
+    end
+end
+
+function UpdateDGlu!(n_tot, d_glu,dt, glu, D, dx, deltax)
+    for i_x in 2:n_tot-1      
+        d_glu[i_x] = ((glu[i_x-1]-glu[i_x])*D[i_x-1]/dx[i_x-1]-(glu[i_x]-glu[i_x+1])*D[i_x]/dx[i_x])*dt/deltax[i_x]
+    end
+    d_glu[1] = (-(glu[1]-glu[2])/dx[1])*D[1]*dt/deltax[1]
+    d_glu[n_tot] = 0
+end
+
+function buildScatter(x, y, n_save)
+    arr_traces = Vector{GenericTrace}
+    for i in 1:n_save
+        println("y[i,:]", y[i,:])
+        trace = scatter(;x=x, y=y[i,:],mode ="line")
+        push!(arr_traces, trace)
+    end
+    return plot(arr_traces)
+end
+
 n_glu = 100
 n_pop = 100
 L_glu = 1e-2
@@ -27,6 +69,7 @@ n_inner = n_iter/n_save
 
 pop_save = zeros(n_save)
 time_save = zeros(n_save)
+glu_save = zeros(n_save, n_tot)
 times = zeros(n_save)
 
 deltax_glu = fill(L_glu/n_glu,n_glu)
@@ -43,47 +86,57 @@ end
 for h in 1:n_pop
     x[h+n_glu] = L_glu + deltax_pop[1]*(h-0.5)
 end
-println(deltax)
 for i in 1:n_tot-1
-    dx[i] = (deltax[i] - deltax[i+1])/2
+    dx[i] = (deltax[i] + deltax[i+1])/2
 end
-println(dx)
-glu = zeros(n_iter,n_tot)
-d_glu = zeros(n_iter, n_tot)
-pop = zeros(n_iter, n_tot)
-s_glu = zeros(n_iter, n_tot)
+glu = zeros(n_tot)
+d_glu = zeros( n_tot)
+pop = zeros(n_tot)
+s_glu = zeros( n_tot)
 
-glu[1,1:n_glu] .= 10
-glu
+glu[1:n_glu] .= 10
 ind = [1,2,3,4,5] .+ n_glu 
-pop[1,ind] .= 1
-
+pop[ind] .= 1
 # traces_arr = []
 # p = plot(scatter(;x=x*1e3, y=glu, mode="line"))
 # push!(traces_arr,p)
 # addtraces(p1, scatter(x = (x2*1e3), y = glu), mode = "markers")
-for i in 1:n_iter
-    for j in (1+n_glu):n_tot
-        mu = mu_0 * glu[i,j]/(k_s + glu[i,j])
-        d_pop = pop[i,j] * mu * dt
-        pop[i,j] = pop[i,j] + d_pop
-        s_glu[i,j] = -d_pop / ratio * rho_pop
+
+
+
+for time_step in 1:n_save #save points
+    println("current step : $time_step")
+    for i_inner in 1:n_inner #actual computation
+        # println("glu = $glu")
+        UpdateValues!(n_glu, n_tot, mu_0, k_s, dt, ratio, rho_pop, glu, pop, s_glu)
+        SmoothArr!(n_glu, n_tot, pop)
+        UpdateD!(n_glu, n_tot, D_gl, D, pop)
+        UpdateDGlu!(n_tot, d_glu, dt, glu, D, dx, deltax)
+        @. glu = glu + d_glu + s_glu
     end
-    for j in (1+n_glu):n_tot
-        if pop[i,j] > 1
-            pop[i, j+1] = pop[i,j+1] + pop[i, j] -1
-            pop[i,j] = 1
-        end
-    end
-    for j in (n_glu+1):n_tot
-        D[i,j] = D_gl * pop[i,j]
-    end
-    for j in 2:(n_tot-1)
-        d_glu[i,j] = ((glu[i,j-1]-glu[i,j])*D[i,j-1]/dx[i,j-1]-(glu[i,j]-glu[i,j+1])*D[i,j]/dx[i,j])*dt/deltax[i,j]
-    end
-    d_glu[i,1] = (-(glu[i,1]-glu[i,2])/dx[1])*D[i,1]*dt/deltax[1]
-    d_glu[n_tot] = 0
-    @. glu = glu + d_glu + s_glu
+    glu_save[time_step,:] = glu
+    pop_save[time_step] = sum(pop)
+    time_save[time_step] = dt*time_step*n_inner/3600
 end
 
+# println("glu_save = ",glu_save[1])
+# for i in eachindex(glu_save)
+#     println("glu at time $i = ", glu_save[i])
+# end
+plot(scatter(;x = time_save,y= pop_save, mode = "markers"))
+# layout = Layout(xaxis_range = [0,10], yaxis_range = [0,10])
+# test = []
+# trace1 = scatter(;x=x*1e3, y = glu_save[1,:], mode = "line")
+# trace2 = scatter(;x=x*1e3, y = glu_save[20,:], mode = "line")
+# trace3 = scatter(;x=x*1e3, y = glu_save[10,:], mode = "line")
+# push!(test, trace1)
+# push!(test, trace2)
+# push!(test, trace3)
 
+# plot(test)
+# plot([trace1, trace2])
+# print("gone through succesfully")
+traces = Vector{GenericTrace}(undef, n_save)
+for i in 1:n_save
+    traces[i] = scatter(x = x*1e3, y = glu_save[i,:], mode = "line", name = "$i",line_color = "red")
+end
