@@ -52,9 +52,7 @@ n_glu = 100
 n_pop = 100
 L_glu = 1e-2
 L_pop = 1e-3
-
 n_tot = n_glu + n_pop
-
 mu_0 = 0.29/(24*3600)
 k_s = 0.2
 dt = 1
@@ -114,13 +112,27 @@ for time_step in 1:n_save #save points
     time_save[time_step] = dt*time_step*n_inner/3600
 end
 
+layout1 = Layout(
+    title = "Bacterial Growth",
+    xaxis_title = "Temps (h)",
+    yaxis_title = "Height (m)"
+)
 
+layout2 = Layout(
+    title = "Glucose Concentration",
+    xaxis_title = "X * 1000",
+    yaxis_title = "Glucose Concentration"
+)
 
-plot(scatter(;x = time_save,y= pop_save, mode = "markers"))
+plt1 = plot(scatter(;x = time_save,y= pop_save, mode = "markers"),layout1)
 
-
-# traces = Vector{GenericTrace}(undef, n_save)
-# for i in 1:n_save
-#     traces[i] = scatter(x = x*1e3, y = glu_save[i,:], mode = "line", name = "$i",line_color = "red")
-# end
-# plot(traces)
+traces = Vector{GenericTrace}(undef, n_save)
+for i in 1:n_save
+    t = i*dt*n_inner/3600
+    traces[i] = scatter(x = x*1e3, y = glu_save[i,:],
+     mode = "line", name = "$i",
+     line = attr(color = "red", width = 1))
+end
+plt2 = plot(traces, layout2)
+display(plt1)
+display(plt2)

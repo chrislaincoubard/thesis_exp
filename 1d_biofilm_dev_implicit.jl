@@ -121,10 +121,26 @@ for time_steps in 1:n_save
     time_save[time_steps] = dt*time_steps*n_inner/3600
 end
 
-# plot(scatter(;x = time_save/24, y = pop_save/100, mode = "markers"))
+layout1 = Layout(
+    title = "Bacterial Growth",
+    xaxis_title = "Temps (h)",
+    yaxis_title = "Height (m)"
+    )
+
+layout2 = Layout(
+    title = "Glucose concentration",
+    xaxis_title = "X * 1000",
+    yaxis_title = "Glucose Concentration"
+)
+plt1 = plot(scatter(;x = time_save, y = pop_save, mode = "markers"), layout1)
 
 traces = Vector{GenericTrace}(undef, n_save)
 for i in 1:n_save
-    traces[i] = scatter(x = x*1e3, y = glu_save[i,:], mode = "line", name = "$i",line_color = "red")
+    t = i*dt*n_inner/3600
+    traces[i] = scatter(x = x*1e3, y = glu_save[i,:], 
+        mode = "line", name = "$t h",
+        line = attr(color = "red", width = 1))
 end
-plot(traces)
+plt2 = plot(traces, layout2)
+display(plt1)
+display(plt2)
