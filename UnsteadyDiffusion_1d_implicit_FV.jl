@@ -97,7 +97,6 @@ end
 T = SolveT(nx, nt, A, B, Tini)
 T = Taugmented(T, Tini, TL, nt)
 
-
 #Plot using PlotlyJS for interactivity
 x = dx/2:dx:L-dx/2
 x = vcat(0,x,L)
