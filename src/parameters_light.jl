@@ -3,9 +3,9 @@ using Parameters
 @with_kw struct TimeParams @deftype Number
     t_tot = 7*86400 #(s)
     dt = 150
-    n_iter = t_tot/dt
-    n_save = 40
-    n_inner = n_iter/n_save
+    n_iter::Int = t_tot/dt
+    n_save = 32
+    n_inner::Int = n_iter/n_save
 end
 
 @with_kw struct SpaceParams @deftype Number

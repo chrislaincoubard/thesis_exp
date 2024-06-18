@@ -51,6 +51,7 @@ B = zeros(sp.n_tot)
 
 
 for time_steps in 1:tp.n_save
+    println(typeof(time_steps))
     for i_inner in 1:tp.n_inner
         UpdateValues!(sp.n_glu, sp.n_tot, mp.mu_0, mp.k_s, tp.dt, mp.ratio, mp.rho_pop, glu, pop, s_glu)
         SmoothArr!(sp.n_glu, sp.n_tot, pop)

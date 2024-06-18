@@ -2,10 +2,12 @@ using PlotlyJS
 include("parameters_light.jl")
 using Statistics
 
-function computelight!(arrLight, I0, ke, dx, nx)
+function computelight!(arrLight, I0, ke, dx, nx,pop)
     arrLight[1] = I0
     for i in 1:nx-1
-        arrLight[i+1] = arrLight[i]*((1-(ke*dx*i)))
+        if pop[i] != 0
+            arrLight[i+1] = arrLight[i]*((1-(ke*dx*i)))
+        end 
     end
 end
 
@@ -17,53 +19,80 @@ function computegrowthrate!(µ,i, I, R, k, sigma, tau, kd, kr)
     µ[i] = (k*sigma*I) / (1 + tau*sigma*I + (kd/kr)*tau*(sigma*I)^2) - R 
 end
 
+function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, nx, pop)
+    for i in 1:nx
+        if pop[i] != 0
+            R = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
+            µ[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2) - R
+        end
+    end
+end
+
+function updateheight!(pop,µ)
+    for i in eachindex(pop)
+        pop[i] = pop[i] * µ[i] + pop[i]
+    end
+end
+
+function smootharray!(pop, nx)
+    for i in 1:nx-1
+        if pop[i] > dx
+            pop[i+1] = pop[i+1] + pop[i] -dx
+            pop[i] = dx
+        end
+    end
+end
+
 # sp = SpaceParams()
 tp = TimeParams()
 mp = ModelParams()
 
-
-x = 1e-4 
+x = 5e-4 
 nx = 1000
 dx = x/nx
-
-DLI = zeros(nx)
 xplt = 0:dx:x
+
+
+space = zeros(nx)
+space[1:100] .= mp.ke
+DLI = zeros(nx)
 µ = zeros(nx)
-pop = zeros(nx)
+height = zeros(nx)
+height[1:100] .= dx
 
-
-
-# DLI[1] = mp.I0
-for i in 1:nx
-    R = computerespiration(mp.RD, mp.RL, DLI[i], mp.n, mp.Ik)
-    mu = computegrowthrate!(µ, i, DLI[i], R, mp.k, mp.sigma, mp.tau, mp.kd, mp.kr)
-end
-
-
-# for i in 1:nx-1
-#     DLI[i+1] = DLI[i]*((1-(mp.ke*dx*i)))
-# end
-
-computelight!(DLI, mp.I0, mp.ke, dx, nx)
-
-#
-mumean = mean(µ)*3600
-
+µ_save = zeros(tp.n_save, nx)
+time_save = zeros(tp.n_save)
+height_save = zeros(tp.n_save)
 #Random testing
-x0 = 1e-6
-ttest = 180
-biom = zeros(ttest)
-biom[1] = x0
-cb = 1.4e5
-height = zeros(ttest)
-height[1] = 1e-6
+dt = 150
+nt = tp.t_tot / dt
+height2 = zeros(nx)
 
-for i in 1:(ttest-1)
-    biom[i+1] = biom[i] * mumean + biom[i]
-    height[i+1] = height[i] *mumean + height[i]
+for time_step in 1:tp.n_save
+    for i_inner in 1:tp.n_inner
+        computelight!(DLI, mp.I0, mp.ke, dx, nx, height)
+        updatemu!(µ, mp.RD, mp.RL, DLI, mp.n, mp.Ik,mp.k, mp.sigma, mp.tau, mp.kd, mp.kr, nx, height)
+        updateheight!(height, µ)
+        smootharray!(height, nx)
+
+    end
+    if time_step == 2
+        for i in 1:nx
+            if height[i] != 0
+                height[i] != 0
+                println("height[i] : ", height[i], " -- i : ",i)
+            end
+        end
+    end
+    time_save[time_step] = tp.dt*time_step*tp.n_inner/3600
+    height_save[time_step] = sum(height)
+    µ_save[time_step,:] = µ
 end
+
 
 ########## Plots ##############
+
+
 layout1 = Layout(
     title = "Light attenuation",
     xaxis_title = "Height (mm)",
@@ -76,27 +105,19 @@ layout2 = Layout(
     yaxis_title = "growth rate (d-1)"
 )
 
-layout3 = Layout(
-    title = "dry biomass per unit of support area (surface biomass)",
-    xaxis_title = "Time (h)",
-    yaxis_title = "surface biomass"
-)
-
-layout4 = Layout(
-    title = "Height of biofilm",
-    xaxis_title = "time (h)",
-    yaxis_title = "height (m)"
-)
+# layout3 = Layout(
+#     title = "Height of biofilm",
+#     xaxis_title = "time (h)",
+#     yaxis_title = "height (m)"
+# )
 plt = plot(
     scatter(y = DLI, x = xplt*1e3, mode = "line", line = attr(color = "blue")), layout1)
 display(plt)
 
-
 plt2 = plot(scatter(y = µ*86400, x = xplt*1e4, mode = "markers"), layout2)
 display(plt2)
 
-
-pp = plot(scatter(y=biom, x = 0:ttest, mode = "markers"), layout3)
-display(pp)
-ppp = plot(scatter(y=height, x = 0:ttest, mode = "line"))
-display(ppp)
+plt3 = plot(scatter(x = 0:40, y = height_save, mode = "markers"))
+display(plt3)
+# ppp = plot(scatter(y=height, x = 0:ttest, mode = "line"), layout3)
+# display(ppp)
