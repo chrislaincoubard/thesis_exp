@@ -124,7 +124,7 @@ end
 layout1 = Layout(
     title = "Bacterial Growth",
     xaxis_title = "Temps (h)",
-    yaxis_title = "Height (m)"
+    yaxis_title = "Height"
     )
 
 layout2 = Layout(
