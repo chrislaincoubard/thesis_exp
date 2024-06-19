@@ -52,7 +52,7 @@ end
 #Init values
 
 n_glu = 100
-n_pop = 200
+n_pop = 300
 L_glu = 1e-2 #gelose
 L_pop = 2e-3 #culture
 

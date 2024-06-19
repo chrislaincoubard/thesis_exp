@@ -28,9 +28,9 @@ function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, nx, pop)
     end
 end
 
-function updateheight!(pop,µ)
+function updateheight!(pop,µ,dt)
     for i in eachindex(pop)
-        pop[i] = pop[i] * µ[i] + pop[i]
+        pop[i] = pop[i] * µ[i] * dt + pop[i]
     end
 end
 
@@ -47,46 +47,38 @@ end
 tp = TimeParams()
 mp = ModelParams()
 
-x = 5e-4 
-nx = 1000
+x = 1.5e-4 
+nx = 100
 dx = x/nx
 xplt = 0:dx:x
 
 
 space = zeros(nx)
-space[1:100] .= mp.ke
+space[1:10] .= mp.ke
 DLI = zeros(nx)
+light_save = zeros(tp.n_save, nx)
 µ = zeros(nx)
 height = zeros(nx)
-height[1:100] .= dx
-
+height[1:10] .= dx
+mumean_save = zeros(n_save)
 µ_save = zeros(tp.n_save, nx)
 time_save = zeros(tp.n_save)
 height_save = zeros(tp.n_save)
 #Random testing
-dt = 150
-nt = tp.t_tot / dt
-height2 = zeros(nx)
+print(tp.n_inner)
 
 for time_step in 1:tp.n_save
     for i_inner in 1:tp.n_inner
         computelight!(DLI, mp.I0, mp.ke, dx, nx, height)
         updatemu!(µ, mp.RD, mp.RL, DLI, mp.n, mp.Ik,mp.k, mp.sigma, mp.tau, mp.kd, mp.kr, nx, height)
-        updateheight!(height, µ)
+        updateheight!(height, µ, tp.dt)
         smootharray!(height, nx)
 
-    end
-    if time_step == 2
-        for i in 1:nx
-            if height[i] != 0
-                height[i] != 0
-                println("height[i] : ", height[i], " -- i : ",i)
-            end
-        end
     end
     time_save[time_step] = tp.dt*time_step*tp.n_inner/3600
     height_save[time_step] = sum(height)
     µ_save[time_step,:] = µ
+    light_save[time_step,:] = DLI
 end
 
 
@@ -95,7 +87,7 @@ end
 
 layout1 = Layout(
     title = "Light attenuation",
-    xaxis_title = "Height (mm)",
+    xaxis_title = "Height (µm)",
     yaxis_title = "light intensity (µmol*m-2*s-1)"
 )
 
@@ -105,19 +97,48 @@ layout2 = Layout(
     yaxis_title = "growth rate (d-1)"
 )
 
-# layout3 = Layout(
-#     title = "Height of biofilm",
-#     xaxis_title = "time (h)",
-#     yaxis_title = "height (m)"
-# )
+layout3 = Layout(
+    title = "Height of biofilm",
+    xaxis_title = "time (h)",
+    yaxis_title = "height (m)"
+)
+
+
+traces = Vector{GenericTrace}(undef, tp.n_save)
+for i in 1:tp.n_save
+    t = i*tp.dt*tp.n_inner/3600
+    traces[i] = scatter(x = xplt, y = light_save[i,:], 
+        mode = "line", name = "$t h",
+        line = attr(color = "red", width = 1))
+end
+
+traces_µ = Vector{GenericTrace}(undef, tp.n_save)
+for i in 1:tp.n_save
+    t = i*tp.dt*tp.n_inner/3600
+    traces_µ[i] = scatter(x = xplt, y = µ_save[i,:], 
+        mode = "line", name = "$t h",
+        line = attr(color = "red", width = 1))
+end
+
 plt = plot(
-    scatter(y = DLI, x = xplt*1e3, mode = "line", line = attr(color = "blue")), layout1)
-display(plt)
+    scatter(y = DLI, x = xplt*1e6, mode = "line", line = attr(color = "blue")), layout1)
+# display(plt)
 
 plt2 = plot(scatter(y = µ*86400, x = xplt*1e4, mode = "markers"), layout2)
-display(plt2)
+# display(plt2)
 
-plt3 = plot(scatter(x = 0:40, y = height_save, mode = "markers"))
-display(plt3)
-# ppp = plot(scatter(y=height, x = 0:ttest, mode = "line"), layout3)
+plt3 = plot(scatter(x = time_save, y = height_save, mode = "markers"), layout3)
+# display(plt3)
+# ppp = plot(scatter(y=height2, x = 0:tp.n_save, mode = "line"), layout3)
 # display(ppp)
+
+plt5 = plot(bar(x = time_save, y = height_save))
+# display(plt5)
+
+plt_light = plot(traces)
+# display(plt_light)
+
+plt_mu = plot(traces_µ)
+display(plt_mu)
+
+print(height[1:30])

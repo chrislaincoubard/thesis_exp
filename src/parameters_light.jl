@@ -16,7 +16,7 @@ end
 
 
 @with_kw struct ModelParams @deftype Number
-    I0 = 800 #Initial Light intensity (µmol*m-2*s-1)
+    I0 = 2000 #Initial Light intensity (µmol*m-2*s-1)
     ke = 1400 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
     kr = 1.16e-2 #repair rate (s-1)
