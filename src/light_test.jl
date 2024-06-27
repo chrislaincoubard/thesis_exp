@@ -5,15 +5,12 @@ using DelimitedFiles
 
 function computelight!(arrLight, I0, ke, dx, nx,pop)
     arrLight[1] = I0
-    for i in 1:nx-1
+    for i in 2:nx
         if pop[i] != 0
-            arrLight[i+1] = arrLight[i]*((1-(ke*dx*i)))
+        arrLight[i] = I0*exp(-ke*(dx*i))
         end 
     end
-end
-
-function computerespiration(RD, RL, I, n, Ik)
-    return RD + (RL - RD) * (I^n/(I^n + Ik^n))
+    
 end
 
 function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, nx, pop)
@@ -27,7 +24,9 @@ end
 
 function updateheight!(pop,µ,dt)
     for i in eachindex(pop)
+        if pop[i] != 0
         pop[i] = pop[i] * µ[i] * dt + pop[i]
+        end
     end
 end
 
@@ -50,19 +49,19 @@ x = 1e-4
 nx = 1000
 dx = x/nx
 xplt = 0:dx:x
-
+rho = 1.4e-5
+X0 = 40*dx*rho
 LI = zeros(nx)
 µ = zeros(nx)
 
 height = zeros(nx)
-height[1:100] .= dx
-mumean_save = zeros(tp.n_save)
+height[1:40] .= dx
 µ_save = zeros(tp.n_save, nx)
 time_save = zeros(tp.n_save)
 pop_save = zeros(tp.n_save, nx)
 height_save = zeros(tp.n_save)
 
-
+println(tp.n_iter)
 for time_step in 1:tp.n_save
     for i_inner in 1:tp.n_inner
         computelight!(LI, mp.I0, mp.ke, dx, nx, height)
@@ -83,7 +82,7 @@ end
 
 layout1 = Layout(
     title = "Light attenuation",
-    xaxis_title = "depth (m)",
+    xaxis_title = "depth ",
     yaxis_title = "light intensity (µmol*m-2*s-1)"
 )
 
@@ -121,7 +120,7 @@ end
 
 
 plt = plot(
-    scatter(y = LI, x = xplt*1e6, mode = "line", line = attr(color = "blue")), layout1)
+    scatter(y = LI, x = xplt, mode = "line", line = attr(color = "blue")), layout1)
 display(plt)
 
 plt2 = plot(scatter(y = µ, x = xplt, mode = "markers"), layout2)

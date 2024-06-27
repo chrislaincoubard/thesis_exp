@@ -2,7 +2,7 @@ using Parameters
 
 @with_kw struct TimeParams @deftype Number
     t_tot = 7*86400 #(s)
-    dt = 150
+    dt = 50
     n_iter::Int = t_tot/dt
     n_save = 32
     n_inner::Int = n_iter/n_save
@@ -17,7 +17,7 @@ end
 
 @with_kw struct ModelParams @deftype Number
     I0 = 200 #Initial Light intensity (µmol*m-2*s-1)
-    ke = 1400 #biofilm light extinction coefficient (m-1)
+    ke = 11400 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
     kr = 1.16e-2 #repair rate (s-1)
     kd = 0.15 #damage rate (dimentionless)
@@ -27,4 +27,5 @@ end
     Ik = 50 #half saturating light for light respiration (µmol*m-2*s-1)
     RD = 9.15e-8 #respiration in dark phase (s-1)
     RL = 1.78e-6 #respiration in light phase (s-1)
+    rho = 1.4e5 #biomass volumic mass
 end
