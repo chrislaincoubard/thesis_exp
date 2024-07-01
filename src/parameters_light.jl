@@ -4,7 +4,7 @@ using Parameters
     t_tot = 7*86400 #(s)
     dt = 50
     n_iter::Int = t_tot/dt
-    n_save = 32
+    n_save = 42
     n_inner::Int = n_iter/n_save
 end
 
@@ -16,7 +16,7 @@ end
 
 
 @with_kw struct ModelParams @deftype Number
-    I0 = 100 #Initial Light intensity (µmol*m-2*s-1)
+    I0 = 200 #Initial Light intensity (µmol*m-2*s-1)
     ke = 11650 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
     kr = 1.16e-2 #repair rate (s-1)
