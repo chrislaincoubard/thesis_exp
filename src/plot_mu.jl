@@ -3,7 +3,7 @@ using Statistics
 using LinearAlgebra
 using ColorSchemes
 using DataFrames
-include("parameters_light.jl")
+include("model_parameters.jl")
 
 function computelight!(arrLight, I0, ke, dz, nz)
     arrLight[1] = I0
@@ -20,7 +20,7 @@ function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, nz)
     end
 end
 
-function build_trace(df, x)
+function buildmutraces(df, x)
     traces = Vector{GenericTrace}(undef, length(names(df)))
     for (index, n) in enumerate(names(df))
     dfcol_clean = filter(x -> x!= 0, df[!,n])
@@ -46,7 +46,7 @@ for I0 in light_intensities
     µ = zeros(nz)
     computelight!(LI, I0, mp.ke, dz, nz)
     updatemu!(µ, mp.RD, mp.RL, LI, mp.n, mp.Ik,mp.k, mp.sigma, mp.tau, mp.kd, mp.kr, nz)
-    colname = "$I0 µmol/m²/s"
+    colname = "$I0"
     df_mu[!,colname] = µ
 end
 
@@ -54,11 +54,15 @@ layout = Layout(
     title = "growth rate variation over depth of biofilm", 
     xaxis_title = "depth (m)", 
     yaxis_title = "growth rate (d-1)",
-    legend_title_text="Incident light intensity"
+    legend_title_text="Incident light intensity",
+    legend_itemsizing="constant"
     )
 
-traces = build_trace(df_mu, zplt)
+# traces = buildmutraces(df_mu, zplt)
 
-plttest = plot(traces, layout)
-display(plttest)
+# plttest = plot(traces, layout)
+# display(plttest)
 
+# savefig(plttest, "mu.png")
+
+println(mean(df."200"))

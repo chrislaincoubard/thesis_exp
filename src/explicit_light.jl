@@ -5,7 +5,7 @@
 using PlotlyJS
 using Statistics
 using DelimitedFiles
-include("parameters_light.jl")
+include("model_parameters.jl")
 
 function computelight!(arrLight, I0, ke, dx, nx,pop)
     arrLight[1] = I0
