@@ -83,7 +83,7 @@ l_histo = Layout(
     yaxis_title = "Height (µm)",
     height = 800,
     barmode = "stack")
-tr = traceshisto(df100_clean)
+tr = traceshisto(df_clean)
 plt = plot(tr, l_histo)
 display(plt)
 l = Layout(

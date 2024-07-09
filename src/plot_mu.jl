@@ -34,8 +34,9 @@ end
 
 mp = ModelParams() 
 light_intensities = [100,200,300,500,1000]
-z = 2e-4
-nz = 10000
+length(light_intensities)
+z = 1e-4
+nz = 1000
 dz = z/nz
 zplt = 0:dz:z
 df_mu = DataFrame()
@@ -51,18 +52,18 @@ for I0 in light_intensities
 end
 
 layout = Layout(
-    title = "growth rate variation over depth of biofilm", 
+    title = "Growth rate variation over depth of a 200µm biofilm", 
     xaxis_title = "depth (m)", 
     yaxis_title = "growth rate (d-1)",
     legend_title_text="Incident light intensity",
     legend_itemsizing="constant"
     )
 
-# traces = buildmutraces(df_mu, zplt)
+traces = buildmutraces(df_mu, zplt)
 
-# plttest = plot(traces, layout)
-# display(plttest)
+plttest = plot(traces, layout)
+display(plttest)
 
-# savefig(plttest, "mu.png")
+println(mean(df_mu."200"*86400))
 
-println(mean(df."200"))
+

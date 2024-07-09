@@ -1,10 +1,10 @@
 using Parameters
 
 @with_kw struct TimeParams @deftype Number
-    t_tot = 7*86400 #(s)
+    t_tot = 15*86400 #(s)
     dt = 50
     n_iter::Int = t_tot/dt
-    n_save = 42
+    n_save = 40
     n_inner::Int = n_iter/n_save
 end
 
@@ -19,7 +19,7 @@ end
     I0 = 200 #Initial Light intensity (µmol*m-2*s-1)
     ke = 11650 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
-    kr = 1.16e-2 #repair rate (s-1)
+    kr = 1.16e-3 #repair rate (s-1)
     kd = 0.15 #damage rate (dimentionless)
     tau = 1.06e-3 #turnover time electron transfer chain (s-1)
     sigma = 1.59e-2 #cross section of PSII (m2*µmol-1)

@@ -39,3 +39,23 @@ function discretegradcol(continous_gradient, size)
     end
     return col_scale
 end
+
+function traceshistocolgrad(df)
+    traces = Vector{GenericTrace}(undef, length(df.Height))
+    for (index, value) in enumerate(df.Height)
+        if index % 2 == 0
+        println("if : $index")
+        color_index = convert(Int64, time[index]/4)
+        tr = bar(name = "$(df[index,:Time]) h", x = ["$(df[index, :Intensity])"], y = [value],
+        width = [0.2], marker_color = col_scale[color_index])
+        traces[index] = tr
+        else
+            color_index = convert(Int64, time[index]/4)
+        println("else : $index")
+        tr = bar(name = "$(df[index,:Time]) h", x = ["$(df[index, :Intensity])"], y = [value],
+        width = [0.2], marker_color = col_scale[color_index], showlegend = false)
+        traces[index] = tr
+        end
+    end
+    return traces
+end
