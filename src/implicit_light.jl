@@ -14,18 +14,14 @@ include("functions_plots.jl")
 
 
 tp = TimeParams()
-mp = ModelParams() 
+hmp = HanModelParams() 
 light_intensities = [100,200,300,500,1000]
 z = 1e-3
 nz = 1000
 dz = z/nz
 zplt = 0:dz:z
 
-µ_save = zeros(tp.n_save, nz)
 time_save = zeros(tp.n_save)
-pop_save = zeros(tp.n_save, nz)
-height_save = zeros(tp.n_save)
-
 df_mu = DataFrame()
 df_height = DataFrame(Height = Float64[], Intensity=String[], Time = Int64[])
 df = DataFrame()
@@ -35,18 +31,18 @@ for I0 in light_intensities
     µ = zeros(nz)
     pop = zeros(nz)
     height = zeros(tp.n_save)
-    X0 = mp.rho * dz
+    X0 = hmp.rho * dz
     pop[1:30] .= X0
     println("Start for $I0")
     for time_step in 1:tp.n_save
         for i_inner in 1:tp.n_inner
-            computelight!(LI, I0, mp.ke, dz, nz, pop)
-            updatemu!(µ, mp.RD, mp.RL, LI, mp.n, mp.Ik,mp.k, mp.sigma, mp.tau, mp.kd, mp.kr, nz, pop)
+            computelight!(LI, I0, hmp.ke, dz, nz, pop)
+            updatemu!(µ, hmp.RD, hmp.RL, LI, hmp.n, hmp.Ik,hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, nz, pop)
             pop .= solvematrix(µ, tp.dt, nz, pop)
             smootharray!(pop, nz, X0)
         end
         time = tp.dt*time_step*tp.n_inner/3600
-        currheight = sum(pop) / mp.rho
+        currheight = sum(pop) / hmp.rho
         time_save[time_step] = time
         height[time_step] = currheight
         push!(df_height, [currheight, "$I0", time])

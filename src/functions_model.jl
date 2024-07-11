@@ -8,6 +8,12 @@ function computelight!(arrLight, I0, ke, dz, nz,pop)
     
 end
 
+function updateheight!(pop,µ,dt)
+    for i in eachindex(pop)
+        pop[i] = pop[i] * µ[i] * dt + pop[i]
+    end
+end
+
 function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, nz, pop)
     for i in 1:nz
         if pop[i] != 0
@@ -32,5 +38,14 @@ function smootharray!(pop, nz, X)
             pop[i+1] = pop[i+1] + pop[i] -X
             pop[i] = X
         end
+    end
+end
+
+function updateO2!(O, dt, dz, D)
+    if pop != 0
+        for i in eachindex(O)[Not 1]
+            O[i] = ((O[i-1]-O[i])*D/dz-(O[i]-O[i+1]*D/dz))*dt/dz
+        end
+        O[1] = ((glu[2]-glu[1])/dz)*D*dt/dz
     end
 end

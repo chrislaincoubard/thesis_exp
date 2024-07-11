@@ -1,10 +1,10 @@
 using Parameters
 
 @with_kw struct TimeParams @deftype Number
-    t_tot = 15*86400 #(s)
+    t_tot = 7*86400 #(s)
     dt = 50
     n_iter::Int = t_tot/dt
-    n_save = 40
+    n_save = 42
     n_inner::Int = n_iter/n_save
 end
 
@@ -14,8 +14,7 @@ end
     dx = x/nx
 end
 
-
-@with_kw struct ModelParams @deftype Number
+@with_kw struct HanModelParams @deftype Number
     I0 = 200 #Initial Light intensity (µmol*m-2*s-1)
     ke = 11650 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
@@ -28,4 +27,11 @@ end
     RD = 9.15e-8 #respiration in dark phase (s-1)
     RL = 1.78e-6 #respiration in light phase (s-1)
     rho = 1.4e5 #biomass volumic mass
+end
+
+@with_kw struct GasesParams @deftype Number
+    #D_oxygen
+    #k_O/x
+    #D_Co2
+    
 end
