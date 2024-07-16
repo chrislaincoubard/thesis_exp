@@ -40,7 +40,6 @@ end
 function buildScatter(x, y, n_save)
     arr_traces = Vector{GenericTrace}
     for i in 1:n_save
-        println("y[i,:]", y[i,:])
         trace = scatter(;x=x, y=y[i,:],mode ="line")
         push!(arr_traces, trace)
     end
@@ -88,6 +87,8 @@ end
 for i in 1:n_tot-1
     dx[i] = (deltax[i] + deltax[i+1])/2
 end
+x
+dx
 glu = zeros(n_tot)
 d_glu = zeros( n_tot)
 pop = zeros(n_tot)
@@ -110,6 +111,7 @@ for time_step in 1:n_save #save points
     glu_save[time_step,:] = glu
     pop_save[time_step] = sum(pop)
     time_save[time_step] = dt*time_step*n_inner/3600
+    println(d_glu)
 end
 
 layout1 = Layout(

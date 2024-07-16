@@ -2,9 +2,9 @@ using Parameters
 
 @with_kw struct TimeParams @deftype Number
     t_tot = 7*86400 #(s)
-    dt = 50
-    n_iter::Int = t_tot/dt
-    n_save = 42
+    dt = 0.00001
+    n_iter::Int = round(Int, t_tot/dt)
+    n_save = 32
     n_inner::Int = n_iter/n_save
 end
 
@@ -30,8 +30,12 @@ end
 end
 
 @with_kw struct GasesParams @deftype Number
-    #D_oxygen
-    #k_O/x
-    #D_Co2
-    
+    D_oxygen = 1.99e-9*0.68
+    kO_x = 1.13
+    P02 = 0.21*101325
+    R = 8.31446261815324
+    T = 25+273.15
+    O2atm = 2.74e-4
+    VO2_x = 1.13
+    Mx = 24
 end

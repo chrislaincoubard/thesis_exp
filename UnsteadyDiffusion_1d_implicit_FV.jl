@@ -60,7 +60,7 @@ Fo = a*dt/dx^2
 # A = zeros(nx,nx)
 
 #Boundary conditions
-TL = 0 #°C
+TL = 50 #°C
 
 #Initial condition
 Tini = 200 #°C
