@@ -27,13 +27,22 @@ function makeO2coefmatrix(DO2, dz, dt, pop)
     return A
 end
 
-function make02Bmatrix(O2, O2atm, D, dz, dt, pop,mu)
+function computesource(mu, VO2x, mx, pop, dz,dt)
+    ind = findfirst(x -> x == 0, pop) - 1
+    source = zeros(ind)
+    for i in eachindex(source)
+        source[i] = ((mu[i]*pop[i])*VO2x*dt)/(mx*dz)
+    end
+    return source
+end
+
+function make02Bmatrix(O2, O2surf, D, dz, dt, pop, S)
     ind = findfirst(x -> x == 0, pop) -1 
     B = zeros(ind)
-    for i in eachindex(B)
-        B[i] = O2[i] +(mu[i]*gp.VO2_x)/(pop[i]*gp.Mx)*dt
+    for i in eachindex(B)[Not(1)]
+        B[i] = O2[i] +S[i]
     end
-    B[1] = O2[1] + 2*dt*D*O2atm/dz^2
+    B[1] = O2[1] + (2*dt*D*O2surf)/dz^2 + S[1]
     return B
 end
 
@@ -41,21 +50,22 @@ end
 tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
-light_intensities = [100,200,300,500,1000]
-# light_intensities = [200]
+# light_intensities = [100,200,300,500,1000]
+light_intensities = [500]
 z = 1e-3
 nz = 1000
 dz = z/nz
 zplt = 0:dz:z
 matO2 = zeros(tp.n_save, nz)
 time_save = zeros(tp.n_save)
-df_mu = DataFrame()
+df_H = DataFrame()
 df_height = DataFrame(Height = Float64[], Intensity=String[], Time = Float64[])
 df = DataFrame()
-df_O2 = DataFrame()
 
 for I0 in light_intensities
     LI = zeros(nz)
+    µ_gross = zeros(nz)
+    R = zeros(nz)
     µ = zeros(nz)
     pop = zeros(nz)
     height = zeros(tp.n_save)
@@ -66,16 +76,21 @@ for I0 in light_intensities
     for time_step in 1:tp.n_save
         for i_inner in 1:tp.n_inner
             computelight!(LI, I0, hmp.ke, dz, pop)
+            grossmu(µ_gross, LI, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
+            respiration(R, LI, hmp.RD, hmp.RL, hmp.Ik, hmp.n, pop)
             updatemu!(µ, hmp.RD, hmp.RL, LI, hmp.n, hmp.Ik,hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
             pop .= solvematrix(µ, tp.dt, nz, pop)
+            smootharray!(pop, X0)
             A = makeO2coefmatrix(gp.D_oxygen, dz, tp.dt, pop)
-            B= make02Bmatrix(O2, gp.O2atm, gp.D_oxygen,dz, tp.dt, pop,µ)
-            if i_inner in 1:2 && time_step == 1
-                println(B)
+            S = computesource(µ, gp.VO2_x, gp.Mx, pop, dz, tp.dt)
+            B= make02Bmatrix(O2, gp.O2surf, gp.D_oxygen,dz, tp.dt, pop,S)
+            if i_inner == tp.n_inner && time_step == tp.n_save
+                clean_source = filter(x-> x!=0, S)
+                pip = plot(scatter(x = zplt, y = clean_source, mode = "markers"), Layout(title = "Source 02"))
+                display(pip)
             end
             new_O2 = A \ B
             O2[1:length(new_O2)] .= new_O2
-            smootharray!(pop, nz, X0)
         end
         time = tp.dt*time_step*tp.n_inner/3600
         currheight = sum(pop) / hmp.rho
@@ -83,13 +98,16 @@ for I0 in light_intensities
         height[time_step] = currheight
         push!(df_height, [currheight, "$I0", time])
         # df_O2[!,"$time_step"] = O2
-        matO2[time_step,:] .= O2 
+        # matO2[time_step,:] .= O2 
     end
-    
     colname = "$I0"
-    df_mu[!,colname] = µ
-    df[!,colname] = height
-    df_O2[!,colname] = O2
+    df[!,"µ_net"] = µ
+    df[!,"µ_gross"] = µ_gross
+    df[!,"R"] = R
+    df_H[!,"height"] = height
+    df[!,"light"] = LI
+    df[!,"Intensity"] .= I0
+    df[!,"Oxygen"] = O2
 end
 println("Done with calulation")
 
@@ -108,23 +126,37 @@ function buildO2traces(df, x)
 end
 
 # mu_traces = buildmutraces(df_mu, zplt)
-
-O2_traces = buildO2traces(df_O2, zplt)
-
-plot(O2_traces, Layout(title = "test"))
+clean_O2 = filter(x -> x!=0, df[!,"Oxygen"])
+plott = plot(scatter(x = zplt, y = clean_O2, mode = "markers"),Layout(title = "O2 along depth"))
+display(plott)
 
 # plotmutraces(mu_traces, "C:/Users/LGPM Bamako/Documents/Results", "mu_plot.png")
 # # writedlm( "height.csv",  df_height, ',')
 # println(first(df,5))
+name = "$(light_intensities[1])"
 
-# pl = plot([
-#     scatter(x = time_save, y = df."100", mode = "markers", name = "100"), 
-#     scatter(x = time_save, y = df."200", mode = "markers", name = "200"),
-#     scatter(x = time_save, y = df."300", mode = "markers", name = "300"),
-#     scatter(x = time_save, y = df."500", mode = "markers", name = "500"),
-#     scatter(x = time_save, y = df."1000", mode = "markers", name = "1000"),
-# ])
-# display(pl)
+clean_R = filter(x -> x!= 0, df[!,"R"])
+clean_µ = filter(x -> x!= 0, df[!,"µ_net"])
+clean_grossµ = filter(x -> x!= 0, df[!,"µ_gross"])
+clean_light = filter(x -> x!=0, df[!,"light"])
+
+
+
+pl = plot([
+    # scatter(x = zplt, y = df_mu."100".*86400, mode = "markers", name = "100"), 
+    scatter(x = zplt, y = clean_grossµ*86400, mode = "markers", name = "µ gross"),
+    scatter(x = zplt, y = clean_µ.*86400, mode = "markers", name = "µ net"),
+    scatter(x = zplt, y = clean_R*86400, mode = "markers", name = "R")
+    
+    # scatter(x = zplt, y = df_mu."300".*86400, mode = "markers", name = "300"),
+    # scatter(x = zplt, y = df_mu."500".*86400, mode = "markers", name = "500"),
+    # scatter(x = zplt, y = df_mu."1000".*86400, mode = "markers", name = "1000"),
+], Layout(title = "growth rate"))
+display(pl)
+
+pp = plot(scatter(x = zplt, y = clean_light, mode = "markers"), Layout(title = "Light"))
+display(pp)
+
 # plpl = plot(O2_traces)
 # display(plpl)
 # println(first(df_O2, 50))

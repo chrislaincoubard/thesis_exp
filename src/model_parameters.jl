@@ -2,7 +2,7 @@ using Parameters
 
 @with_kw struct TimeParams @deftype Number
     t_tot = 7*86400 #(s)
-    dt = 0.00001
+    dt = 1
     n_iter::Int = round(Int, t_tot/dt)
     n_save = 32
     n_inner::Int = n_iter/n_save
@@ -22,20 +22,16 @@ end
     kd = 0.15 #damage rate (dimentionless)
     tau = 1.06e-3 #turnover time electron transfer chain (s-1)
     sigma = 1.59e-2 #cross section of PSII (m2*µmol-1)
-    n = 3 #switching rate between RL and RD (dimentionless)
+    n = 2 #switching rate between RL and RD (dimentionless)
     Ik = 50 #half saturating light for light respiration (µmol*m-2*s-1)
     RD = 9.15e-8 #respiration in dark phase (s-1)
     RL = 1.78e-6 #respiration in light phase (s-1)
-    rho = 1.4e5 #biomass volumic mass
+    rho = 1.4e2 #biomass volumic mass
 end
 
 @with_kw struct GasesParams @deftype Number
-    D_oxygen = 1.99e-9*0.68
-    kO_x = 1.13
-    P02 = 0.21*101325
-    R = 8.31446261815324
-    T = 25+273.15
-    O2atm = 2.74e-4
+    D_oxygen = 0.68*1.99*10^-9
+    O2surf = 0.274
     VO2_x = 1.13
-    Mx = 24
+    Mx = 0.024
 end

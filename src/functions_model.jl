@@ -13,11 +13,25 @@ function updateheight!(pop,µ,dt)
     end
 end
 
+function grossmu(µ_gross,I,k, sigma, tau, kd, kr, pop)
+    ind = findfirst(x -> x == 0, pop)
+    for i in 1:ind
+        µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
+    end
+end
+
+function respiration(R, I, RD, RL, Ik, n, pop)
+    ind = findfirst(x -> x == 0, pop)
+    for i in 1:ind
+        R[i] = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
+    end
+end
+
 function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, pop)
     ind = findfirst(x -> x == 0, pop)
     for i in 1:ind
-            R = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
-            µ[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2) - R
+        R = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
+        µ[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2) - R
     end
 end
 
@@ -31,11 +45,11 @@ function solvematrix(mu, deltaT, nz, b)
     return mat_diag \ b
 end
 
-function smootharray!(pop, nz, X)
-    for i in 1:nz-1
-        if pop[i] > X
-            pop[i+1] = pop[i+1] + pop[i] -X
-            pop[i] = X
+function smootharray!(arr, X)
+    for i in eachindex(arr)
+        if arr[i] > X
+            arr[i+1] = arr[i+1] + arr[i] -X
+            arr[i] = X
         end
     end
 end

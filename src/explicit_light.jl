@@ -53,16 +53,13 @@ for I0 in light_intensities
     pop[1:30] .= X0
     println("Start for $I0")
 for time_step in 1:tp.n_save
+    println("we're at $time_step")
     for i_inner in 1:tp.n_inner
         computelight!(LI, I0, hmp.ke, dz, pop)
         updatemu!(µ, hmp.RD, hmp.RL, LI, hmp.n, hmp.Ik,hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
         updateheight!(pop, µ, tp.dt)
         smootharray!(pop, nz, X0)
         updateO2!(O2, tp.dt, dz, gmp.D_oxygen, pop, gmp.O2atm)
-        if i_inner in 1:2 && time_step == 1
-            println(first(O2,30))
-        end
-
     end
     time = tp.dt*time_step*tp.n_inner/3600
     currheight = sum(pop) / hmp.rho
