@@ -13,25 +13,25 @@ function updateheight!(pop,µ,dt)
     end
 end
 
-function grossmu!(µ_gross,I,k, sigma, tau, kd, kr, pop)
-    ind = findfirst(x -> x == 0, pop)
+function grossmu!(µ_gross, I, k, sigma, tau, kd, kr, pop)
+    ind = findfirst(x->x==0, pop)
     for i in 1:ind
         µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
     end
 end
 
 function respiration!(R, I, RD, RL, Ik, n, pop)
-    ind = findfirst(x -> x == 0, pop)
+    ind = findfirst(x->x==0, pop)
     for i in 1:ind
-        R[i] = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
+        R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
+        # R[i] = 0.15/86400
     end
 end
 
-function updatemu!(µ, RD, RL, I, n, Ik, k, sigma, tau, kd, kr, pop)
+function updatemu!(µ,gross_µ, R, pop)
     ind = findfirst(x -> x == 0, pop)
     for i in 1:ind
-        R = RD + (RL - RD) * (I[i]^n/(I[i]^n + Ik^n))
-        µ[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2) - R
+        µ[i] =  gross_µ[i] - R[i]
     end
 end
 
