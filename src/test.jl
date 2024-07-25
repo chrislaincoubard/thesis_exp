@@ -5,7 +5,7 @@ using ColorSchemes
 using DataFrames
 include("model_parameters.jl")
 
-mp = ModelParams() 
+mp = HanModelParams() 
 light_intensities = 0:5:1000
 length(light_intensities)
 z = 1e-4

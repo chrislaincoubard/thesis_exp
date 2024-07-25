@@ -61,6 +61,8 @@ dx = zeros(n_tot-1)
 ratio = 0.08
 rho_pop = 1000 * 0.68 *0.08
 
+
+
 n_iter = Int64(t_tot/dt)
 n_save = 40
 n_inner = n_iter/n_save
