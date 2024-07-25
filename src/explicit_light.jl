@@ -16,11 +16,12 @@ include("functions_plots.jl")
 
 function updateO2!(O, dt, dz, D,pop,O2atm)
     ind = findfirst(x -> x == 0, pop)-1
-    O[1] = ((O[2]-O2atm)*D*2/dz)*dt/dz + O[1]
+    a = D*dt/d^2
+    O[1] = (O[1]-O2atm)*2a + O[2]-O[1]*a+ O[1]
     for i in 2:ind-1
-        O[i] = ((O[i+1]-O[i])*D/dz+(O[i]-O[i-1])*D/dz)*dt/dz + O[i]
+        O[i] = (O[i+1]-O[i])*a+(O[i]-O[i-1])*a + O[i]
     end
-    O[ind] = ((O[ind]-O[ind-1])*D/(dz/2))*dt/dz + O[ind]
+    O[ind] = (O[ind]-O[ind-1])*a + O[ind]
 end
 
 tp = TimeParams()
