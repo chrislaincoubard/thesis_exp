@@ -6,6 +6,7 @@ using ColorTypes
 using CSV
 using Statistics
 using DelimitedFiles
+using LinearAlgebra.LAPACK
 include("model_parameters.jl")
 include("functions_model.jl")
 include("functions_plots.jl")
@@ -20,27 +21,41 @@ function makeO2coefmatrix(DO2, dz, dt, pop)
         A[i, i+1] = -coef
         A[i, i] = 1+ 2*coef
     end
-    A[1,1] = 1 + 3*coef
+    A[1,1] = 1 +3coef
     A[1,2] = -coef
     A[ind, ind-1] = -coef
     A[ind, ind] = 1 + coef
     return A
 end
 
+function getdiagonals(DO2, dz, dt, pop)
+    ind = findfirst(x -> x == 0, pop) -1
+    diag = zeros(ind)
+    up = zeros(ind-1)
+    low = zeros(ind-1)
+    coef = DO2*dt/dz^2
+    diag .= 1+2*coef
+    up .= -coef
+    low .= -coef
+    diag[1] = 1+3coef
+    diag[ind] = 1+coef
+    return low, diag, up
+end
+
 function ComputeSource(mu, VO2x, mx, pop, dz, dt)
     ind = findfirst(x -> x == 0, pop) -1 
     source = zeros(ind)
     for i in eachindex(source)
-        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)*dt
+        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)
     end
     return source
 end
 
-function make02Bmatrix(O2, O2atm, D, dz, dt, pop,S)
+function computeB(O2, O2atm, D, dz, dt, pop,S)
     ind = findfirst(x -> x == 0, pop) -1 
     B = zeros(ind)
     for i in eachindex(B)[Not(1)]
-        B[i] = O2[i] + S[i]
+        B[i] = O2[i] + S[i]*dt
         # B[i] = O2[i]
     end
     # B[1] = O2[1] + 2*dt*D*O2atm/dz^2
@@ -55,7 +70,7 @@ gp = GasesParams()
 # light_intensities = [100,200,300,500,1000]
 light_intensities = [200]
 z = 1e-3
-nz = 1000
+nz = 100000
 dz = z/nz
 zplt = 0:dz:z
 time_save = zeros(tp.n_save)
@@ -66,6 +81,7 @@ df_O2 = DataFrame()
 df_S = DataFrame()
 
 for I0 in light_intensities
+    ##Initialize Array
     LI = zeros(nz)
     µ = zeros(nz)
     µ_gross = zeros(nz)
@@ -74,8 +90,10 @@ for I0 in light_intensities
     height = zeros(tp.n_save)
     X0 = hmp.rho * dz
     O2 = zeros(nz)
-    pop[1:30] .= X0
+    O22 = zeros(nz)
+    pop[1:3000] .= X0
     println("Start for $I0")
+    #Starting time (2 loops to save data at specific time points)
     for time_step in 1:tp.n_save
         println("Start $time_step")
         for i_inner in 1:tp.n_inner
@@ -86,20 +104,23 @@ for I0 in light_intensities
             pop .= solvematrix(µ, tp.dt, nz, pop)
             ind = findfirst(x -> x == 0, pop)
             smootharray!(pop, X0)
-            
-            A = makeO2coefmatrix(gp.D_oxygen, dz, tp.dt, pop)
             S = ComputeSource(µ, gp.VO2_x, gp.Mx,pop, dz, tp.dt)
-            B = make02Bmatrix(O2, gp.O2atm, gp.D_oxygen,dz, tp.dt, pop,S)
-            new_O2 = A \ B
-            O2[1:length(new_O2)] .= new_O2
-            
-            if i_inner == tp.n_inner && time_step == tp.n_save
-                p = plot(scatter(x = zplt*10^6, y = S./150, mode = "markers"), 
-                Layout(title = "O2 production by photosynthesis",
+            low, diag, up = getdiagonals(gp.D_oxygen, dz, tp.dt, pop)
+            B = computeB(O2, gp.O2atm, gp.D_oxygen, dz, tp.dt, pop,S)
+            LinearAlgebra.LAPACK.gtsv!(low, diag, up, B)
+            O2[1:length(B)] .= B
+            if i_inner == tp.n_inner #&& time_step == tp.n_save
+                pp = plot(scatter(x = zplt*10^6, y = O2, mode = "line"), 
+                Layout(title = "02 concentration profile",
                 xaxis_title = "Depth (µm)",
-                yaxis_title = "O2 production mol/m3/s"))
-                display(p)
-                savefig(p, "C:/Users/chris/OneDrive/Images/plots/O2 prod.png")
+                yaxis_title = "O2 concentration mol/m3"))
+                display(pp)
+                # pp = plot(scatter(x = zplt*10^6, y = S, mode = "markers"), 
+                # Layout(title = "O2 production by photosynthesis",
+                # xaxis_title = "Depth (µm)",
+                # yaxis_title = "O2 production mol/m3/s"))
+                # display(pp)
+                # savefig(p, "C:/Users/chris/OneDrive/Images/plots/O2 prod.png")
             end
         end
         time = tp.dt*time_step*tp.n_inner/3600
@@ -140,15 +161,15 @@ clean_light = cleanarr(df[!,"light"])
 # clean_oxygen = cleanarr(df[!,"oxygen"])
 
 pltR = plot([
-    scatter(x = zplt*10^6, y = clean_R.*86400, mode = "markers", name = "Respiration"),
-    scatter(x = zplt*10^6, y = clean_grossµ.*86400, mode = "markers", name = "µ brut"),
-    scatter(x = zplt*10^6, y = clean_µ.*86400, mode = "markers", name = "µ net")],
+    scatter(x = zplt*10^6, y = clean_R.*86400, mode = "line", name = "Respiration"),
+    scatter(x = zplt*10^6, y = clean_grossµ.*86400, mode = "line", name = "µ brut"),
+    scatter(x = zplt*10^6, y = clean_µ.*86400, mode = "line", name = "µ net")],
     Layout(title = "growth rate", xaxis_title = "Depth of biofilm (µm)", yaxis_title = "s-1"))
 
 
 pltLight = plot(scatter(x = zplt*10^6, y = clean_light, mode = "markers"), 
 Layout(title = "Light", xaxis_title = "Depth (µm)", yaxis_title = "PPFD (µmol/m²/s)"))
-pltheight = plot(scatter(x = time_save, y = df_height[!,"Height"].*10^6, mode = "markers"), 
+pltheight = plot(scatter(x = time_save, y = df_height[!,"Height"].*10^6, mode = "line"), 
     Layout(title = "Biofilm Growth", xaxis_title = "Time (h)", yaxis_title = "Height (µm)"))
 display(pltheight)
 # pltOxygen = plot(scatter(x = zplt*10^6, y = clean_oxygen, mode = "markers"), 

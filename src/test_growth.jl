@@ -11,7 +11,7 @@ end
 function respiration!(R, I, RD, RL, Ik, n)
     for i in eachindex(R)
         R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
-        # R[i] = 0.15/86400
+        # R[i] = 0.12/86400
     end
 end
 
@@ -101,4 +101,4 @@ display(pltR)
 #      ))
 
 # display(lightpl)
-savefig(pltR, "C:/Users/chris/OneDrive/Images/plots/growth_200_Yan_plus_light.png")
+# savefig(pltR, "C:/Users/chris/OneDrive/Images/plots/growth_200_Yan_plus_light.png")

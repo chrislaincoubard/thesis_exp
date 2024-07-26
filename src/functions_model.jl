@@ -24,7 +24,7 @@ function respiration!(R, I, RD, RL, Ik, n, pop)
     ind = findfirst(x->x==0, pop)
     for i in 1:ind
         R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
-        # R[i] = 0.15/86400
+        # R[i] = 0.2/86400
     end
 end
 
