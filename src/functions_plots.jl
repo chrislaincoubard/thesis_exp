@@ -59,3 +59,7 @@ function traceshistocolgrad(df)
     end
     return traces
 end
+
+function removezeros!(arr)
+    return filter(x->x!=0, arr)    
+end

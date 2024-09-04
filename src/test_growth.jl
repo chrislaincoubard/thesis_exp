@@ -35,16 +35,31 @@ end
 function po2!(po2, light, a, b, c)
     for i in eachindex(po2)
         I = light[i]
-        po2[i] = I / (a*I^2 + b*I + c)
+        po2[i] = (I / (a*I^2 + b*I + c))
     end
 end
 
+function rO2!(rO2, light, RO2min, RO2max, Ik, n)
+    for i in eachindex(rO2)
+        rO2[i] = (RO2min + RO2max * light[i]^n / (Ik^n + light[i]^n))
+    end
+end
+
+function netO2(PO2, RO2)
+    NO2 = zeros(length(PO2))
+    @. NO2 = PO2 - RO2 
+    return NO2
+end
+
+
+
 mp = HanModelParams()
+gp = GasesParams()
 z = 5e-4
 nz = 500
 dz = z/nz
 zplt = 0:dz:z
-over_light = collect(0:5:2500)
+over_light = collect(0:5:2000)
 
 k = 3.6467e-4
 kr = 4.8e-4
@@ -53,10 +68,14 @@ tau = 6.849
 sigma = 1.9e-3
 
 PO2 = zeros(length(over_light))
-
+RO2 = zeros(length(over_light))
 a = 3.42e-7
 b = 9.30e-4
 c = 2.90e-1
+RO2min = 52.17 #(mgO2/L/h)
+RO2max = 153.00 #(mgO2/L/h)
+Ik = 1152 #(µmolphotons/m2/s)
+n = 1.90
 mu = zeros(nz)
 mu_gross = zeros(nz)
 mu_gross2 = zeros(nz)
@@ -70,6 +89,8 @@ light_1000 = zeros(nz)
 
 computelight!(light, mp.I0, mp.ke, dz)
 po2!(PO2, over_light, a, b, c)
+rO2!(RO2, over_light, RO2min, RO2max, Ik, n)
+NO2 = netO2(PO2, RO2)
 # computelight!(light_100, 100, mp.ke, dz)
 # computelight!(light_500, 500, mp.ke, dz)
 # computelight!(light_1000, 1000, mp.ke, dz)
@@ -83,9 +104,13 @@ grossmu!(mu_gross, light, mp.k, mp.sigma, mp.tau, mp.kd, mp.kr)
 respiration!(resp, light, mp.RD, mp.RL, mp.Ik, mp.n)
 updatemu!(mu, mu_gross, resp)
 
-pp = plot(scatter(x = over_light, y = PO2, mode = "line"), Layout(title = "TEST"))
+pp = plot(scatter(x = over_light, y = PO2, mode = "line"), Layout(title = "PO2"))
+pl = plot(scatter(x = over_light, y = RO2, mode = "line"), Layout(title = "RO2"))
+pn = plot(scatter(x = over_light, y = NO2, mode = "line"), Layout(title = "NO2"))
 # clean_oxygen = cleanarr(df[!,"oxygen"])
-
+display(pp)
+display(pl)
+display(pn)
 # pltR = plot([
 #     scatter(x = zplt, y = resp.*86400, mode = "line", name = "Respiration", line = attr(color = "orange")),
 #     scatter(x = zplt, y = mu_gross.*86400, mode = "line", name = "µ brut", line =attr(color = "blue")),

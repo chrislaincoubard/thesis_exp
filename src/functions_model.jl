@@ -24,7 +24,7 @@ function respiration!(R, I, RD, RL, Ik, n, pop)
     ind = findfirst(x->x==0, pop)
     for i in 1:ind
         R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
-        # R[i] = 0.2/86400
+        # R[i] = 0.12/86400
     end
 end
 
@@ -36,30 +36,54 @@ function updatemu!(µ,gross_µ, R, pop)
 end
 
 
-function solvematrix(mu, deltaT, nz, b)
-    diag = zeros(nz)
-    for i in 1:nz
-        diag[i] = 1- mu[i] * deltaT
-    end
+function solvematrix(mu, deltaT, b)
+    diag = 1 .- mu * deltaT
     mat_diag = Diagonal(diag)
     return mat_diag \ b
 end
 
 function smootharray!(arr, X)
-    for i in eachindex(arr)
+    n = length(arr)
+    for i in 1:n-1
         if arr[i] > X
-            arr[i+1] = arr[i+1] + arr[i] -X
+            excess = arr[i] - X
             arr[i] = X
+            arr[i+1] += excess
         end
     end
 end
 
-function updateO2!(O, dt, dz, D,pop, Oatm)
-    ind = findfirst(x -> x == 0, pop)
-    for i in 2:ind
-        O[i] = ((O[i-1]-O[i])*D/dz-(O[i]-O[i+1]*D/dz))*dt/dz
-    end
-    O[1] = ((O[2]-Oatm)*2*D/dz+((O[2]-O[1])*D/dz))*dt/dz
-    O[ind] = ((O[ind-1]-O[ind])*D*2/dz)*dt/dz
-
+function getdiagonals(D, dz, dt, pop)
+    ind = findfirst(x -> x == 0, pop) -1
+    coefDiff = D*dt/dz^2
+    diag = fill(1 + 2 * coefDiff, ind)
+    up = fill(-coefDiff, ind-1)
+    low = fill(-coefDiff, ind-1)
+    diag[1] = 1+3*coefDiff
+    diag[ind] = 1+coefDiff
+    return low, diag, up
 end
+
+
+# function computeO2source(mu, VO2x, mx, pop, dz)
+#     ind = findfirst(x -> x == 0, pop) -1 
+#     return (mu[1:ind] .* (pop[1:ind] ./ dz) .* VO2x) ./ mx
+# end
+
+function computeO2source(mu, VO2x, mx, pop, dz)
+    ind = findfirst(x -> x == 0, pop) -1 
+    source = zeros(ind)
+    for i in 1:ind
+        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)/100
+    end
+    return source
+end
+
+function computeB(O2, O2surf, D, dz, dt, pop,S)
+    ind = findfirst(x -> x == 0, pop) -1 
+    B = O2[1:ind] .+ S[1:ind] .* dt
+    # B = O2[1:ind]
+    B[1] += 2 * dt * D * O2surf / dz^2
+    return B
+end
+

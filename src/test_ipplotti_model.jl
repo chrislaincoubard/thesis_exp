@@ -7,10 +7,20 @@ using CSV
 using Statistics
 using DelimitedFiles
 using LinearAlgebra.LAPACK
+using Parameters
 include("model_parameters.jl")
 include("functions_model.jl")
 include("functions_plots.jl")
 
+@with_kw struct Ippoparams @deftype Number
+    a = 3.42e-7
+    b = 9.30e-4
+    c = 2.9e-1
+    RO2min = 52.17 #(mgO2/L/h)
+    RO2max = 153.00 #(mgO2/L/h)
+    Ik = 1152 #(µmolphotons/m2/s)
+    n = 1.90
+end
 
 function makeO2coefmatrix(DO2, dz, dt, pop)
     ind = findfirst(x -> x == 0, pop) -1
@@ -45,15 +55,24 @@ function getdiagonals(D,u, dz, dt, pop)
     return low, diag, up
 end
 
-
-function computeO2source(mu, VO2x, mx, pop, dz)
-    ind = findfirst(x -> x == 0, pop) -1 
-    source = zeros(ind)
-    for i in eachindex(source)
-        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)
+function prodO2(light, pop, a, b, c)
+    ind = findfirst(x -> x == 0, pop) -1
+    PO2 = zeros(ind)
+    for i in eachindex(ind)
+        PO2[i] = light[i]/(a*light[i]^2 + b*light[i] + c)
     end
-    return source
+    return PO2
 end
+
+function respO2(light, pop, RO2min, RO2max, Ik, n)
+    ind = findfirst(x -> x == 0, pop) -1
+    RO2 = zeros(ind)
+    for i in eachindex(ind)
+        RO2[i] = RO2min + RO2max * light[i]^n / (Ik^n + light[i]^n)
+    end
+    return RO2
+end
+
 
 function computeB(O2, O2surf, D, dz, dt, pop,S,u)
     ind = findfirst(x -> x == 0, pop) -1 
@@ -67,7 +86,10 @@ function computeB(O2, O2surf, D, dz, dt, pop,S,u)
     return B
 end
 
+function getmubyO2!(mu, O2, )
+end
 
+ip = Ippoparams()
 tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
@@ -78,11 +100,8 @@ nz = Int64(1e3)
 dz = z/nz
 zplt = 0:dz:z
 time_save = zeros(tp.n_save)
-df_mu = DataFrame()
-df_height = DataFrame()
 df = DataFrame()
-df_O2 = DataFrame()
-df_S = DataFrame()
+
 
 for I0 in light_intensities
     ##Initialize Array
@@ -96,7 +115,7 @@ for I0 in light_intensities
     X0 = hmp.rho * dz
     O2 = zeros(nz)
     CO2 = zeros(nz)
-    CO2surf = gp.PCo2 * gp.HCo2 * (1+gp.ka1/10.0^(-gp.phs)+(gp.ka1*gp.ka2/(10.0^(-gp.phs))^2))
+    SO2 = zeros(nz)
     pop[1:30] .= X0
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
@@ -104,23 +123,15 @@ for I0 in light_intensities
         println("Start $time_step")
         for i_inner in 1:tp.n_inner
             computelight!(LI, I0, hmp.ke, dz, pop)
-            grossmu!(µ_gross, LI, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
-            respiration!(R, LI, hmp.RD, hmp.RL, hmp.Ik, hmp.n, pop)
-            updatemu!(µ, µ_gross, R, pop)
+            PO2 = prodO2(LI, pop, ip.a, ip.b, ip.c)
+            RO2 = respO2(LI, pop, ip.RO2min, ip.RO2max, ip.Ik, ip.n)
+            @. SO2 = PO2 - RO2 
             pop .= solvematrix(µ, tp.dt, nz, pop)
             smootharray!(pop, X0)
-            SO2 = computeO2source(µ, gp.VO2_x, gp.Mx,pop, dz)
-            SCO2 = .-SO2
             low, diag, up = getdiagonals(gp.D_oxygen,gp.u, dz, tp.dt, pop)
-            lowCO2, diagCO2, upCO2 = getdiagonals(gp.D_CO2, gp.u, dz, tp.dt, pop)
             B = computeB(O2, gp.O2surf, gp.D_oxygen, dz, tp.dt, pop, SO2, gp.u)
-            BCO2 = computeB(CO2, CO2surf, gp.D_CO2, dz, tp.dt, pop, SCO2, gp.u)
             LinearAlgebra.LAPACK.gtsv!(low, diag, up, B)
-            LinearAlgebra.LAPACK.gtsv!(lowCO2, diagCO2, upCO2, BCO2)
             O2[1:length(B)] .= B
-            # O2 .= ifelse.(O2 .< 0, 0.0, O2)
-            CO2[1:length(BCO2)] .= BCO2
-            # CO2 .= ifelse.(CO2 .< 0, 0.0, CO2)
             if i_inner in tp.n_inner #&& time_step == tp.n_save
                 pp = plot(scatter(x = zplt*10^6, y = O2, mode = "line"), 
                 Layout(title = "02 concentration profile $time_step",
