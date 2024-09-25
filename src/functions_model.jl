@@ -65,16 +65,12 @@ function getdiagonals(D, dz, dt, pop)
 end
 
 
-# function computeO2source(mu, VO2x, mx, pop, dz)
-#     ind = findfirst(x -> x == 0, pop) -1 
-#     return (mu[1:ind] .* (pop[1:ind] ./ dz) .* VO2x) ./ mx
-# end
 
 function computeO2source(mu, VO2x, mx, pop, dz)
-    ind = findfirst(x -> x == 0, pop) -1 
+    ind = findfirst(x -> x == 0, pop)-1 
     source = zeros(ind)
     for i in 1:ind
-        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)/100
+        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)
     end
     return source
 end
@@ -87,3 +83,13 @@ function computeB(O2, O2surf, D, dz, dt, pop,S)
     return B
 end
 
+function calcexcess(arr, X)
+    n = length(arr)
+    total_excess = 0
+    for i in 1:n-1
+        if arr[i] > X
+        total_excess += arr[i] - X
+        end
+    end
+    return total_excess
+end

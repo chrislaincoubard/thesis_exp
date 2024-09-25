@@ -39,7 +39,6 @@ display(pl1)
 display(pl2)
 display(pl3)
 
-#add a line of command to check if the local repository is linked to the online one
 
 # a = mp.k * mp.sigma
 # b = mp.tau * mp.sigma

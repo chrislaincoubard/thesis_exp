@@ -5,63 +5,87 @@ using DataFrames
 using Statistics
 include("utils.jl")
 
-path = raw"C:\Users\LGPM Bamako\Documents\Results\result_model"
+path = raw"C:\Users\chris\OneDrive\Documents\thèse\results"
 dfs = dataframesfromdir(path)
 df = dfs["data_model_300.csv"]
-df_height = dfs["height_model_300.csv"]
-df_integral = dfs["data_full_integral_300.csv"]
-df_mu_1s = dfs["data_model_300_1s.csv"]
-df_mu_150s = dfs["data_model_300_150s.csv"]
-df_mu_1440 = dfs["data_model_300_1444s.csv"]
+dff = dfs["data_model_100.csv"]
+df_height_300 = dfs["height_model_300_7.csv"]
+df_height_100 = dfs["height_model_100_7.csv"]
+df_height_500 = dfs["height_model_500_7.csv"]
+df_height_800 = dfs["height_model_800_7.csv"]
+df_integral_300 = dfs["data_full_integral_300.csv"]
+df_integral_100 = dfs["data_full_integral_100.csv"]
+df_integral_500 = dfs["data_full_integral_500.csv"]
 filter!(row -> !(row.mu_net == 0), df)
 
 zplt = 1:nrow(df)
-
+display(df)
 pltR = plot([
     scatter(x = zplt, y = df[!,"R"].*86400, mode = "line", name = "Respiration"),
     scatter(x = zplt, y = df[!,"gross_mu"].*86400, mode = "line", name = "µ brut"),
-    scatter(x = zplt, y = df[!,"mu_net"].*86400, mode = "line", name = "µ net")],
-    Layout(title = "Growth rate", xaxis_title = "Depth of biofilm (µm)", yaxis_title = "s-1"))
+    scatter(x = zplt, y = df[!,"mu_net"].*86400, mode = "line", name = "µ net"),
+    scatter(x = zplt, y = df[!,"light"], mode = "line", line =attr(dash="dash", color = "red"), name = "light", yaxis = "y2")],
+    Layout(title = "Growth rate", xaxis_title = "Depth of biofilm (µm)", yaxis_title = "s-1",
+    yaxis2 = attr(title = "Light (µmol/m2/s)",overlaying = "y", side ="right"),
+    legend=attr(x=0.7, y=1,),
+    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
 
+pltRR = plot([
+scatter(x = zplt, y = dff[!,"R"].*86400, mode = "line", name = "Respiration"),
+scatter(x = zplt, y = dff[!,"gross_mu"].*86400, mode = "line", name = "µ brut"),
+scatter(x = zplt, y = dff[!,"mu_net"].*86400, mode = "line", name = "µ net"),
+scatter(x = zplt, y = dff[!,"light"], mode = "line", line =attr(dash="dash", color = "red"), name = "light", yaxis = "y2")],
+Layout(title = "Growth rate", xaxis_title = "Depth of biofilm (µm)", yaxis_title = "s-1",
+yaxis2 = attr(title = "Light (µmol/m2/s)",overlaying = "y", side ="right"),
+legend=attr(x=0.855, y=1,),
+modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
 
-pltLight = plot(scatter(x = zplt, y = df[!,"light"], mode = "markers"), 
-Layout(title = "Light", xaxis_title = "Depth (µm)", yaxis_title = "PPFD (µmol/m²/s)"))
+plt_all_height = plot([
+    scatter(x = df_height_300[!,"time"], y = df_height_300[!,"Height"].*10^6, mode = "line", name = "300"),
+    scatter(x = df_height_100[!,"time"], y = df_height_100[!,"Height"].*10^6, mode = "line", name = "100"),
+    scatter(x = df_height_500[!,"time"], y = df_height_500[!,"Height"].*10^6, mode = "line", name = "500"),
+    scatter(x = df_height_800[!,"time"], y = df_height_800[!,"Height"].*10^6, mode = "line", name = "800", line=attr(color = "black"))],
+    Layout(title = "Growth for different light", xaxis_title ="Time (h)", yaxis_title = "Height of biofilm (µm)",
+    modebar_add = ["drawline", "drawopenpath", "eraseshape"])
+)
+display(plt_all_height)
 
 
 pltheight = plot([
-    scatter(x = df_height[!,"time"], y = df_height[!,"Height"].*10^6, mode = "line"),
-    scatter(x = df_integral[!,"time"], y = df_integral[!,"height"].*10^6, mode = "line")], 
-    Layout(title = "Biofilm Growth", xaxis_title = "Time (h)", yaxis_title = "Height (µm)"))
+    scatter(x = df_height_300[!,"time"], y = df_height_300[!,"Height"].*10^6, mode = "line", name ="FVM"),
+    scatter(x = df_integral_300[!,"time"], y = df_integral_300[!,"height"].*10^6, mode = "line", name = "integral")], 
+    Layout(title = "Biofilm Growth, light = 300", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
 display(pltheight)
-display(pltLight)
+pltheight2 = plot([
+    scatter(x = df_height_100[!,"time"], y = df_height_100[!,"Height"].*10^6, mode = "line", name ="FVM"),
+    scatter(x = df_integral_100[!,"time"], y = df_integral_100[!,"height"].*10^6, mode = "line", name = "integral")], 
+    Layout(title = "Biofilm Growth, light = 100", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
+display(pltheight2)
+pltheight3 = plot([
+    scatter(x = df_height_500[!,"time"], y = df_height_500[!,"Height"].*10^6, mode = "line", name ="FVM"),
+    scatter(x = df_integral_500[!,"time"], y = df_integral_500[!,"height"].*10^6, mode = "line", name = "integral")], 
+    Layout(title = "Biofilm Growth, light = 500", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
+display(pltheight3)
+# display(pltLight)
 
-plt_mean = plot([
-    scatter(x = df_height[!,"time"], y = df_height[!,"mean_mu"].*86400, mode = "markers"),
-    scatter(x = df_integral[!,"time"], y = df_integral[!,"mu"].*86400, mode = "markers")],
-Layout(title = "mean mu", xaxis_title = "Time (h)", yaxis_title = "Mean mu (d-1)"))
+# plt_mean = plot([
+#     scatter(x = df_height_300[!,"time"], y = df_height_300[!,"mean_mu"].*86400, mode = "markers"),
+#     scatter(x = df_integral_300[!,"time"], y = df_integral_300[!,"mu"].*86400, mode = "markers")],
+# Layout(title = "mean mu", xaxis_title = "Time (h)", yaxis_title = "Mean mu (d-1)"))
 # pltOxygen = plot(scatter(x = zplt*10^6, y = clean_oxygen, mode = "markers"), 
 # Layout(title = "Oxygen", xaxis_title = "Depth (µm)", yaxis_title = "O2 concentration in mM"))
 
 display(pltR)
-display(plt_mean)
+display(pltRR)
+# display(plt_mean)
+savefig(pltR, raw"C:\Users\chris\OneDrive\Documents\thèse\plots\growthrate300.png")
+savefig(plt_all_height, raw"C:\Users\chris\OneDrive\Documents\thèse\plots\different_light_growth.png")
+savefig(pltheight, raw"C:\Users\chris\OneDrive\Documents\thèse\plots\FVM_vs_Integration_300.png")
+savefig(pltheight2, raw"C:\Users\chris\OneDrive\Documents\thèse\plots\FVM_vs_Integration_100.png")
+savefig(pltheight3, raw"C:\Users\chris\OneDrive\Documents\thèse\plots\FVM_vs_Integration_500.png")
 
-
-plotcomp = plot([
-    scatter(x = zplt, y = df[!,"mu_net"], mode = "markers", name = "50s"),
-    scatter(x = zplt, y = df_mu_1s[!,"mu_net"], mode = "markers", name = "1s"),
-    scatter(x = zplt, y = df_mu_150s[!,"mu_net"], mode = "markers", name = "150s"),
-    scatter(x = zplt, y = df_mu_1440[!,"mu_net"], mode = "markers", name = "1440s")],
-    Layout(title = "test different DeltaT", xaxis_title="dephts (µm)", yaxis_title="net mu"))
-
-display(plotcomp)
-
-# for i in eachindex(df[!,"mu_net"])
-#     if df_mu_1s[!,"mu_net"][i] != df_mu_150s[!,"mu_net"]
-#         bit = df_mu_1s[!,"mu_net"][i] - df_mu_150s[!,"mu_net"][i]
-#         println(bit)
-#         # println("1s = $(df_mu_1s[!,"mu_net"][i]) vs 150s = $(df_mu_150s[!,"mu_net"][i])")
-#     end
-# end
-println(isequal(df_mu_1s[!,"mu_net"], df_mu_150s[!,"mu_net"]))
 
 println("finished")

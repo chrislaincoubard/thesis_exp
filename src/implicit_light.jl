@@ -43,7 +43,7 @@ for I0 in light_intensities
     pop[1:30] .= X0
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
-    for time_step in 1:tp.n_save
+    @time for time_step in 1:tp.n_save
         println("Start $time_step")
         for i_inner in 1:tp.n_inner
             ## Compute growth ##
