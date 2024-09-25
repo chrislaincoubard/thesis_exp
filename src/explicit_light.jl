@@ -1,6 +1,7 @@
 #Biofilm development with light integration
 #Author : Chrislain Coubard
 #Date 06/24
+#Deprecated
 
 using PlotlyJS
 using LinearAlgebra
