@@ -3,12 +3,12 @@ using CSV
 using DataFrames
 using Statistics
 
-data = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\rate_photo_Bminus.csv") |> DataFrame
-data2 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\rate_photoB+.csv") |> DataFrame
+data = CSV.File(raw"C:\Users\Chrislain\Documents\data\rate_photo_Bminus.csv") |> DataFrame
+data2 = CSV.File(raw"C:\Users\Chrislain\Documents\data\rate_photoB+.csv") |> DataFrame
 
-data_control = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thèse\results\control_Oxygen.csv",delim = ";") |> DataFrame
-data_025B = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thèse\results\060924_0,5MBicarbonate.csv", header =75, silencewarnings = true, footerskip = 2) |> DataFrame
-data_05B = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thèse\results\060924_0,25MBicarbonate.csv", header = 75, silencewarnings = true, footerskip = 2) |> DataFrame
+data_control = CSV.File(raw"C:\Users\Chrislain\Documents\data\control_Oxygen.csv",delim = ";") |> DataFrame
+data_025B = CSV.File(raw"C:\Users\Chrislain\Documents\data\060924_0,5MBicarbonate.csv", header =75, silencewarnings = true, footerskip = 2) |> DataFrame
+data_05B = CSV.File(raw"C:\Users\Chrislain\Documents\data\060924_0,25MBicarbonate.csv", header = 75, silencewarnings = true, footerskip = 2) |> DataFrame
 
 
 println(first(data_025B,5))

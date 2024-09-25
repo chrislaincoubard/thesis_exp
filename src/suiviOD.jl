@@ -2,7 +2,7 @@ using PlotlyJS
 using CSV
 using DataFrames
 
-data = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thèse\results\suivicroissance.csv", delim =";" ) |> DataFrame
+data = CSV.File(raw"C:\Users\Chrislain\Documents\data\suivicroissance.csv", delim =";" ) |> DataFrame
 
 data50 = filter(:Intensite => i -> i == 50, data)
 data100 = filter(:Intensite => i -> i == 100, data)

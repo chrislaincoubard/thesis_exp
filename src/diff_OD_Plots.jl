@@ -3,11 +3,11 @@ using CSV
 using DataFrames
 using Statistics
 
-OD190 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\OD190.csv", header = 28, footerskip =2) |> DataFrame
-OD415 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\OD415.csv", header = 28, footerskip =2) |> DataFrame
-OD643 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\OD643.csv", header = 28, footerskip =2) |> DataFrame
-OD862 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\OD862.csv", header = 28, footerskip =2) |> DataFrame
-OD923 = CSV.File(raw"C:\Users\chris\OneDrive\Documents\thesis_code\src\OD923.csv", header = 28, footerskip =2) |> DataFrame
+OD190 = CSV.File(raw"C:\Users\Chrislain\Documents\data\OD190.csv", header = 28, footerskip =2, silencewarnings = true) |> DataFrame
+OD415 = CSV.File(raw"C:\Users\Chrislain\Documents\data\OD415.csv", header = 28, footerskip =2, silencewarnings = true) |> DataFrame
+OD643 = CSV.File(raw"C:\Users\Chrislain\Documents\data\OD643.csv", header = 28, footerskip =2, silencewarnings = true) |> DataFrame
+OD862 = CSV.File(raw"C:\Users\Chrislain\Documents\data\OD862.csv", header = 28, footerskip =2, silencewarnings = true) |> DataFrame
+OD923 = CSV.File(raw"C:\Users\Chrislain\Documents\data\OD923.csv", header = 28, footerskip =2, silencewarnings = true) |> DataFrame
 
 
 pl = plot([

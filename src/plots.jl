@@ -5,7 +5,7 @@ using DataFrames
 using Statistics
 include("utils.jl")
 
-path = raw"C:\Users\chris\OneDrive\Documents\thèse\results"
+path = raw"C:\Users\Chrislain\Documents\data"
 dfs = dataframesfromdir(path)
 df = dfs["data_model_300.csv"]
 dff = dfs["data_model_100.csv"]
