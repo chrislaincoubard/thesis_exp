@@ -16,7 +16,7 @@ include("utils.jl")
 tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
-light_intensities = [100]
+light_intensities = [300]
 z = 1e-3
 nz = Int64(1e3)
 dz = z/nz
@@ -38,8 +38,9 @@ for I0 in light_intensities
     X0 = hmp.rho * dz
     O2 = zeros(nz)
     CO2 = zeros(nz)
-    CO2surf = gp.PCo2 * gp.HCo2 * (1+gp.ka1/10.0^(-gp.phs)+(gp.ka1*gp.ka2/(10.0^(-gp.phs))^2))
-    pop[1:30] .= X0
+    CO2sat = gp.PCo2 * gp.HCo2 * (1+gp.ka1/10.0^(-gp.phs)+(gp.ka1*gp.ka2/(10.0^(-gp.phs))^2))
+    pop[1:25] .= X0
+    print("sum pop start = $(sum(pop))")
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
     @time for time_step in 1:tp.n_save
@@ -57,16 +58,16 @@ for I0 in light_intensities
             SCO2 = .-SO2
             low, diag, up = getdiagonals(gp.D_oxygen, dz, tp.dt, pop)
             lowCO2, diagCO2, upCO2 = getdiagonals(gp.D_CO2, dz, tp.dt, pop)
-            B = computeB(O2, gp.O2surf, gp.D_oxygen, dz, tp.dt, pop, SO2)
+            B = computeB(O2, gp.O2sat, gp.D_oxygen, dz, tp.dt, pop, SO2)
             
-            BCO2 = computeB(CO2, CO2surf, gp.D_CO2, dz, tp.dt, pop, SCO2)
+            BCO2 = computeB(CO2, CO2sat, gp.D_CO2, dz, tp.dt, pop, SCO2)
             LinearAlgebra.LAPACK.gtsv!(low, diag, up, B)
             LinearAlgebra.LAPACK.gtsv!(lowCO2, diagCO2, upCO2, BCO2)
             O2[1:length(B)] .= B
             CO2[1:length(BCO2)] .= BCO2
             # Optionnal plots (comment for speed) ##
             if i_inner in tp.n_inner #&& time_step == tp.n_save
-                p = plot(scatter(x = eachindex(B).*100, y = B, mode = "line" ))
+                p = plot(scatter(x = eachindex(B), y = B, mode = "line" ))
                 display(p)
                 pp = plot(scatter(x = zplt*10^6, y = O2, mode = "line"), 
                 Layout(title = "02 concentration profile $time_step",

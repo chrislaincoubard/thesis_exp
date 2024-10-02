@@ -5,17 +5,17 @@ using DataFrames
 using Statistics
 include("utils.jl")
 
-path = raw"C:\Users\Chrislain\Documents\data"
+path = raw"C:\Users\Chrislain\Documents\Results\result_model"
 dfs = dataframesfromdir(path)
 df = dfs["data_model_300.csv"]
 dff = dfs["data_model_100.csv"]
-df_height_300 = dfs["height_model_300_7.csv"]
-df_height_100 = dfs["height_model_100_7.csv"]
-df_height_500 = dfs["height_model_500_7.csv"]
-df_height_800 = dfs["height_model_800_7.csv"]
-df_integral_300 = dfs["data_full_integral_300.csv"]
-df_integral_100 = dfs["data_full_integral_100.csv"]
-df_integral_500 = dfs["data_full_integral_500.csv"]
+df_height_300 = dfs["height_model_300_update.csv"]
+df_height_100 = dfs["height_model_100_update.csv"]
+df_height_500 = dfs["height_model_500_update.csv"]
+df_height_800 = dfs["height_model_800_update.csv"]
+# df_integral_300 = dfs["data_full_integral_300_update.csv"]
+# df_integral_100 = dfs["data_full_integral_100_update.csv"]
+# df_integral_500 = dfs["data_full_integral_500_update.csv"]
 filter!(row -> !(row.mu_net == 0), df)
 
 zplt = 1:nrow(df)

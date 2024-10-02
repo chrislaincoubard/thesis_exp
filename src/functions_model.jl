@@ -60,7 +60,7 @@ function getdiagonals(D, dz, dt, pop)
     up = fill(-coefDiff, ind-1)
     low = fill(-coefDiff, ind-1)
     diag[1] = 1+3*coefDiff
-    diag[ind] = 1+coefDiff
+    diag[ind] = 1+3*coefDiff
     return low, diag, up
 end
 
@@ -75,11 +75,14 @@ function computeO2source(mu, VO2x, mx, pop, dz)
     return source
 end
 
-function computeB(O2, O2surf, D, dz, dt, pop,S)
+function computeB(O2, O2sat, D, dz, dt, pop,S)
     ind = findfirst(x -> x == 0, pop) -1 
-    B = O2[1:ind] .+ S[1:ind] .* dt
-    # B = O2[1:ind]
-    B[1] += 2 * dt * D * O2surf / dz^2
+    B = zeros(ind)
+    for i in 1:ind
+    B[i] = O2[i] + S[i] * dt
+    end
+    B[1] += 2 * dt * D * O2sat / dz^2
+    B[ind] += 2 * dt * D * O2sat / dz^2
     return B
 end
 

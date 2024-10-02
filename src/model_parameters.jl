@@ -6,6 +6,7 @@ using Parameters
     n_iter::Int = round(Int, t_tot/dt)
     n_save = 40
     n_inner::Int = n_iter/n_save
+    sub = 1e-3
 end
 
 @with_kw struct SpaceParams @deftype Number
@@ -26,13 +27,13 @@ end
     Ik = 50 #half saturating light for light respiration (µmol*m-2*s-1)
     RD = 9.15e-8 #respiration in dark phase (s-1)
     RL = 1.78e-6 #respiration in light phase (s-1)
-    rho = 1.4e5  #biomass volumic mass (kg*m-3)
+    rho = 1.4e2  #biomass volumic mass (kg*m-3)
 end
 
 @with_kw struct GasesParams @deftype Number
     D_oxygen = 0.68*1.99e-9 #coef de diffusion de l'O2 dans le biofilm = 68% du coef de diffusion de l'O2 dans l'eau (m/s)
     D_CO2 = 1.18e-9 #coefficient de diffusion du CO2 assimilé aà celui des ions bicarbonate
-    O2surf = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
+    O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
     u = 5.4e-6 # Velocity of O2 (m/s)

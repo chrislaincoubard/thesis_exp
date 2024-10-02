@@ -16,12 +16,13 @@ include("utils.jl")
 tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
-light_intensities = [100]
+light_intensities = [300]
 z = 1e-3
 nz = Int64(1e3)
 dz = z/nz
 zplt = 0:dz:z
 time_save = zeros(tp.n_save)
+println(tp.n_inner)
 
 @time begin
 for I0 in light_intensities
@@ -36,15 +37,19 @@ for I0 in light_intensities
     pop = zeros(nz)
     height = zeros(tp.n_save)
     X0 = hmp.rho * dz
+    println(X0)
     O2 = zeros(nz)
     CO2 = zeros(nz)
     CO2surf = gp.PCo2 * gp.HCo2 * (1+gp.ka1/10.0^(-gp.phs)+(gp.ka1*gp.ka2/(10.0^(-gp.phs))^2))
-    pop[1:30] .= X0
+    pop[1:15] .= X0
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
     @time for time_step in 1:tp.n_save
         println("Start $time_step")
         for i_inner in 1:tp.n_inner
+            if i_inner % 100 == 0
+                println("i_inner, $i_inner")
+            end
             ## Compute growth ##
             computelight!(light, I0, hmp.ke, dz, pop)
             grossmu!(µ_gross, light, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
@@ -53,28 +58,36 @@ for I0 in light_intensities
             pop .= solvematrix(µ, tp.dt, pop)
             smootharray!(pop, X0)
             ## Compute gases ##
-            SO2 = computeO2source(µ, gp.VO2_x, gp.Mx,pop, dz)
-            SCO2 = .-SO2
-            low, diag, up = getdiagonals(gp.D_oxygen, dz, tp.dt, pop)
-            lowCO2, diagCO2, upCO2 = getdiagonals(gp.D_CO2, dz, tp.dt, pop)
-            B = computeB(O2, gp.O2surf, gp.D_oxygen, dz, tp.dt, pop, SO2)
-            
-            BCO2 = computeB(CO2, CO2surf, gp.D_CO2, dz, tp.dt, pop, SCO2)
-            LinearAlgebra.LAPACK.gtsv!(low, diag, up, B)
-            LinearAlgebra.LAPACK.gtsv!(lowCO2, diagCO2, upCO2, BCO2)
-            O2[1:length(B)] .= B
-            CO2[1:length(BCO2)] .= BCO2
-            # Optionnal plots (comment for speed) ##
-            if i_inner in tp.n_inner #&& time_step == tp.n_save
-                p = plot(scatter(x = eachindex(B).*100, y = B, mode = "line" ))
-                display(p)
+            # for sub in 1:5e4
+                SO2 = computeO2source(µ, gp.VO2_x, gp.Mx,pop, dz)
+                SCO2 = .-SO2
+                low, diag, up = getdiagonals(gp.D_oxygen, dz, tp.sub, pop)
+                lowCO2, diagCO2, upCO2 = getdiagonals(gp.D_CO2, dz, tp.sub, pop)
+                B = computeB(O2, gp.O2sat, gp.D_oxygen, dz, tp.sub, pop, SO2)
+                
+                BCO2 = computeB(CO2, CO2surf, gp.D_CO2, dz, tp.sub, pop, SCO2)
+                LinearAlgebra.LAPACK.gtsv!(low, diag, up, B)
+                LinearAlgebra.LAPACK.gtsv!(lowCO2, diagCO2, upCO2, BCO2)
+                O2[1:length(B)] .= B
+                CO2[1:length(BCO2)] .= BCO2
+            # end
+            # # Optionnal plots O2(comment for speed) ##
+            if i_inner in tp.n_inner && time_step == tp.n_save
+                # p = plot(scatter(x = eachindex(B), y = B, mode = "line" ),
+                # Layout(title = "Source term"))
+                # display(p)
                 pp = plot(scatter(x = zplt*10^6, y = O2, mode = "line"), 
                 Layout(title = "02 concentration profile $time_step",
                 xaxis_title = "Depth (µm)",
                 yaxis_title = "O2 concentration mol/m3"))
                 display(pp)
+                # pCO2 = plot(scatter(x = eachindex(BCO2), y = BCO2, mode = "line"), 
+                # Layout(title = "CO2 source"))
+                # display(pCO2)
+                # ppCO2 = plot(scatter(x= zplt*10^6, y = CO2, mode = "line"),
+                # Layout(title = "CO2 profile"))
             end
-            # # Optionnal plots (comment for speed) ##
+            # # Optionnal plots CO2(comment for speed) ##
             # if i_inner in tp.n_inner #&& time_step == tp.n_save
             #     pp = plot(scatter(x = zplt*10^6, y = CO2, mode = "line"), 
             #     Layout(title = "C02 concentration profile $time_step",
@@ -109,11 +122,11 @@ for I0 in light_intensities
     df_height[!,"mean_mu"] .= mean_mu
 
     #Export dataframe
-    filename = "data_model_$I0.csv" 
-    filename2 = "height_model_$I0.csv"
-    path = joinpath(raw"C:\Users\Chrislain\Documents\Results\result_model",filename)
+    filename = "data_model_$(I0)_udpate.csv" 
+    filename2 = "height_model_$(I0)_update.csv"
+    path1 = joinpath(raw"C:\Users\Chrislain\Documents\Results\result_model",filename)
     path2 = joinpath(raw"C:\Users\Chrislain\Documents\Results\result_model",filename2)
-    CSV.write(path, df)
+    CSV.write(path1, df)
     CSV.write(path2, df_height)
 end
 end
