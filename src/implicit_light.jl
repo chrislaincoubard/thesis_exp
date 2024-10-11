@@ -56,7 +56,7 @@ for I0 in light_intensities
             pop .= solvematrix(µ, tp.dt, pop)
             smootharray!(pop, X0)
             ## Compute gases ##
-            SO2 = computeO2source(µ, gp.VO2_x, gp.Mx,pop, dz)
+            SO2 = computeO2source(µ, gp.VO2_x, gp.Mx, pop, dz)
             SCO2 = .-SO2
             low, diag, up = getdiagonals(gp.D_oxygen, dz, tp.dt, pop)
             lowCO2, diagCO2, upCO2 = getdiagonals(gp.D_CO2, dz, tp.dt, pop)
@@ -69,28 +69,28 @@ for I0 in light_intensities
             CO2[1:length(BCO2)] .= BCO2
             # Optionnal plots (comment for speed) ##
             if i_inner in tp.n_inner #&& time_step == tp.n_save
-                # p = plot(scatter(x = eachindex(B), y = B, mode = "line" ))
-                # display(p)
-                cleanO2 = removezeros(O2)
-                cleanCO2 = removezeros(CO2)
-                file_name_O2 = "O2_profile_$(time_step*i_inner/72)_h.png"
-                file_name_CO2 = "CO2_profile_$(time_step*i_inner/72)_h.png"
-                pp = plot(scatter(x = zplt*10^6, y = cleanO2, mode = "line"), 
-                Layout(title = "02 concentration profile $(time_step*i_inner/72) h",
-                xaxis_title = "Depth (µm)",
-                yaxis_title = "O2 concentration mol/m3",
-                xaxis_range = [0,325],
-                yaxis_range = [0.25,0.45]))
+                p = plot(scatter(x = eachindex(SO2), y = SO2, mode = "line" ))
+                display(p)
+                # cleanO2 = removezeros(O2)
+                # cleanCO2 = removezeros(CO2)
+                # file_name_O2 = "O2_profile_$(time_step*i_inner/72)_h.png"
+                # file_name_CO2 = "CO2_profile_$(time_step*i_inner/72)_h.png"
+                # pp = plot(scatter(x = zplt*10^6, y = cleanO2, mode = "line"), 
+                # Layout(title = "02 concentration profile $(time_step*i_inner/72) h",
+                # xaxis_title = "Depth (µm)",
+                # yaxis_title = "O2 concentration mol/m3",
+                # xaxis_range = [0,325],
+                # yaxis_range = [0.25,0.45]))
 
-                p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
-                Layout(title = "CO2 concentration profile $(time_step*i_inner/72) h",
-                xaxis_title = "Depth (µm)",
-                yaxis_title = "CO2 concentration mol/m3",
-                xaxis_range = [0,325],
-                yaxis_range = [0, 0.28]
-                ))
-                savefig(p, joinpath(save_path_CO2, file_name_CO2))
-                savefig(pp, joinpath(save_path, file_name_O2))
+                # p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
+                # Layout(title = "CO2 concentration profile $(time_step*i_inner/72) h",
+                # xaxis_title = "Depth (µm)",
+                # yaxis_title = "CO2 concentration mol/m3",
+                # xaxis_range = [0,325],
+                # yaxis_range = [0, 0.28]
+                # ))
+                # savefig(p, joinpath(save_path_CO2, file_name_CO2))
+                # savefig(pp, joinpath(save_path, file_name_O2))
             end
             # # Optionnal plots (comment for speed) ##
             # if i_inner in tp.n_inner #&& time_step == tp.n_save

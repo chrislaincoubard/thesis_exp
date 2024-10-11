@@ -5,6 +5,20 @@ using Printf
 include("model_parameters.jl")
 include("functions_model.jl")
 
+function grossmu!(µ_gross, I, k, sigma, tau, kd, kr, pop)
+    ind = findfirst(x->x==0, pop)
+    for i in 1:ind
+        µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
+    end
+end
+
+function respiration!(R, I, RD, RL, Ik, n, pop)
+    ind = findfirst(x->x==0, pop)
+    for i in 1:ind
+        R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
+        # R[i] = 0.12/86400
+    end
+end
 
 
 function O2source(mu, VO2x, mx, dz)
@@ -33,6 +47,8 @@ function diagonals(O2,D, dz, dt)
     return low, diag, up
 end
 
+
+save_path = mkpath("C:/Users/Chrislain/Documents/Results/O2_nosource2")
 gp = GasesParams()
 
 # O2[600:700] .= 0.8
@@ -47,14 +63,14 @@ aa = []
 bb = []
 cc = []
 dd = []
-save_path = mkpath("C:/Users/Chrislain/Documents/Results/O2&Source")
-S = zeros(1000)
-S[1:100] .= 0.03
+
+S = zeros(300)
+# S[1:100] .= 0.03
 
 println("Start")
 # for (deltaT,div,arr) in zip(dts,divs,[aa,bb,cc,dd])
-    O2 = zeros(1000)
-    O2[1:300] .= 0.5
+    O2 = zeros(300)
+    # O2[1:300] .= 0.5
     # println("Start for $(deltaT)")
     # dt_good_format = @sprintf("%.e", deltaT)
     # save_path = mkpath("C:/Users/Chrislain/Documents/Results/O2_$(dt_good_format)s")
