@@ -36,7 +36,7 @@ end
 println(rates_b05)
 
 p = plot([
-    scatter(x = eachindex(rates), y = rates, mode = "line", name = "Control"),
+    scatter(x = eachindex(rates_control), y = rates_control, mode = "line", name = "Control"),
     scatter(x = eachindex(rates_b025), y = rates_b025, mode = "line", name = "Bicarb 0.25"),
     scatter(x = eachindex(rates_b05), y = rates_b05, mode = "line", name = "Bicarb 0.5")
     ],

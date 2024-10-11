@@ -1,10 +1,10 @@
 using Parameters
 
 @with_kw struct TimeParams @deftype Number
-    t_tot = 15*86400 #(s)
+    t_tot = 7*86400 #(s)
     dt = 50
     n_iter::Int = round(Int, t_tot/dt)
-    n_save = 40
+    n_save = 168
     n_inner::Int = n_iter/n_save
     sub = 1e-3
 end

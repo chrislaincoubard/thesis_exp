@@ -51,24 +51,24 @@ plt_all_height = plot([
 display(plt_all_height)
 
 
-pltheight = plot([
-    scatter(x = df_height_300[!,"time"], y = df_height_300[!,"Height"].*10^6, mode = "line", name ="FVM"),
-    scatter(x = df_integral_300[!,"time"], y = df_integral_300[!,"height"].*10^6, mode = "line", name = "integral")], 
-    Layout(title = "Biofilm Growth, light = 300", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
-    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
-display(pltheight)
-pltheight2 = plot([
-    scatter(x = df_height_100[!,"time"], y = df_height_100[!,"Height"].*10^6, mode = "line", name ="FVM"),
-    scatter(x = df_integral_100[!,"time"], y = df_integral_100[!,"height"].*10^6, mode = "line", name = "integral")], 
-    Layout(title = "Biofilm Growth, light = 100", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
-    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
-display(pltheight2)
-pltheight3 = plot([
-    scatter(x = df_height_500[!,"time"], y = df_height_500[!,"Height"].*10^6, mode = "line", name ="FVM"),
-    scatter(x = df_integral_500[!,"time"], y = df_integral_500[!,"height"].*10^6, mode = "line", name = "integral")], 
-    Layout(title = "Biofilm Growth, light = 500", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
-    modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
-display(pltheight3)
+# pltheight = plot([
+#     scatter(x = df_height_300[!,"time"], y = df_height_300[!,"Height"].*10^6, mode = "line", name ="FVM"),
+#     scatter(x = df_integral_300[!,"time"], y = df_integral_300[!,"height"].*10^6, mode = "line", name = "integral")], 
+#     Layout(title = "Biofilm Growth, light = 300", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+#     modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
+# display(pltheight)
+# pltheight2 = plot([
+#     scatter(x = df_height_100[!,"time"], y = df_height_100[!,"Height"].*10^6, mode = "line", name ="FVM"),
+#     scatter(x = df_integral_100[!,"time"], y = df_integral_100[!,"height"].*10^6, mode = "line", name = "integral")], 
+#     Layout(title = "Biofilm Growth, light = 100", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+#     modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
+# display(pltheight2)
+# pltheight3 = plot([
+#     scatter(x = df_height_500[!,"time"], y = df_height_500[!,"Height"].*10^6, mode = "line", name ="FVM"),
+#     scatter(x = df_integral_500[!,"time"], y = df_integral_500[!,"height"].*10^6, mode = "line", name = "integral")], 
+#     Layout(title = "Biofilm Growth, light = 500", xaxis_title = "Time (h)", yaxis_title = "Height (µm)",
+#     modebar_add = ["drawline", "drawopenpath", "eraseshape"]))
+# display(pltheight3)
 # display(pltLight)
 
 # plt_mean = plot([

@@ -1,19 +1,22 @@
 using LinearAlgebra
 using PlotlyJS
 using Distributions
+using Printf
 include("model_parameters.jl")
 include("functions_model.jl")
 
+
+
 function O2source(mu, VO2x, mx, dz)
     source = zeros(ind)
-    source .= 0
+    source[0:100] .= 0.3
     return source
 end
 
-function compB(O2, O2sat, D, dz, dt)
+function compB(O2,S, O2sat, D, dz, dt)
     B = zeros(length(O2))
     for i in eachindex(O2)
-        B[i] = O2[i]
+        B[i] = O2[i] + S[i] * dt
     end
     B[1] += 2 * dt * D * O2sat / dz^2
     B[end] += 2 * dt * D * O2sat / dz^2
@@ -31,36 +34,75 @@ function diagonals(O2,D, dz, dt)
 end
 
 gp = GasesParams()
-O2 = zeros(1000)
-# O2[1:300] .= 0.5
+
 # O2[600:700] .= 0.8
 dz = 1e-6
-
+dts = [1e-1,1e-2,1e-3,1e-4]
+# divs = [10,100,1000,10000]
+div = 1000
 t_tot = 600 #(s)
-dt = 1e-4
-n_iter::Int = round(Int, t_tot/dt)
-println(n_iter)
-n_save = 40
-n_inner::Int = n_iter/n_save
-println(n_inner)
+deltaT = 1e-3
+#a = 0.1, b = 0.01, c = 0.001, d = 0.0001
+aa = []
+bb = []
+cc = []
+dd = []
+save_path = mkpath("C:/Users/Chrislain/Documents/Results/O2&Source")
 S = zeros(1000)
-fill!(S, 0.8)
-for time_step in 1:n_save
-    println("Start $time_step")
-    for i_inner in 1:n_inner
-        b = compB(O2, gp.O2sat, gp.D_oxygen,dz,dt)
-        low, diag, up = diagonals(O2, gp.D_oxygen, dz, dt)
+S[1:100] .= 0.03
+
+println("Start")
+# for (deltaT,div,arr) in zip(dts,divs,[aa,bb,cc,dd])
+    O2 = zeros(1000)
+    O2[1:300] .= 0.5
+    # println("Start for $(deltaT)")
+    # dt_good_format = @sprintf("%.e", deltaT)
+    # save_path = mkpath("C:/Users/Chrislain/Documents/Results/O2_$(dt_good_format)s")
+    n_iter::Int = round(Int, t_tot/deltaT)
+    for i in 1:n_iter
+        b = compB(O2,S, gp.O2sat, gp.D_oxygen,dz,deltaT)
+        low, diag, up = diagonals(O2, gp.D_oxygen, dz, deltaT)
         LinearAlgebra.LAPACK.gtsv!(low, diag, up, b)
         O2 .= b
-        if i_inner % 10000 == 0 #&& time_step == n_save
-                # p = plot(scatter(x = eachindex(B), y = B, mode = "line" ),
-                # Layout(title = "Source term"))
-                # display(p)
-                pp = plot(scatter(x = eachindex(O2), y = O2, mode = "line"), 
-                Layout(title = "02 concentration profile $(i_inner/10000)",
-                xaxis_title = "Depth (µm)",
-                yaxis_title = "O2 concentration mol/m3"))
-                display(pp)
+        if i % div == 0 #&& time_step == n_save
+            time = Int(i/div)
+            # p = plot(scatter(x = eachindex(B), y = B, mode = "line" ),
+            # Layout(title = "Source term"))
+            # display(p)
+            
+            pp = plot(scatter(x = eachindex(O2), y = O2, mode = "line"), 
+            Layout(title = "02 concentration profile after $(time) s",
+            xaxis_title = "Depth (µm)",
+            yaxis_title = "O2 concentration mol/m3",
+            yaxis_range = [-0.01, 0.55]))
+            if time < 10
+                file_name = "P_0$(time)_source.png"
+            else
+                file_name = "P_$(time)_source.png"
             end
+            savefig(pp, joinpath(save_path, file_name))
+            display(pp)
+            # # #Test concat plot
+            # push!(arr, scatter(x = eachindex(O2), y = O2, mode = "line"))
+        end
     end
-end
+# end
+
+# println("Start creating plot")
+# for i in 1:600
+#     traces = [a[i], b[i], c[i], d[i]]
+#     pp = plot(traces, 
+#     Layout(title = "02 concentration profile after $(i) s",
+#     xaxis_title = "Depth (µm)",
+#     yaxis_title = "O2 concentration mol/m3",
+#     yaxis_range = [-0.01, 0.55]))
+#     if i < 10
+#         file_name = "P_0$i.png"
+#     else
+#         file_name = "P_$i.png"
+#     end
+#     savefig(pp, joinpath(save_path, file_name))
+#     # display(pp)
+# end
+
+println("End")

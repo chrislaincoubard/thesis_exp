@@ -22,6 +22,8 @@ nz = Int64(1e3)
 dz = z/nz
 zplt = 0:dz:z
 time_save = zeros(tp.n_save)
+save_path = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_O2")
+save_path_CO2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_CO2")
 
 @time begin
 for I0 in light_intensities
@@ -67,13 +69,28 @@ for I0 in light_intensities
             CO2[1:length(BCO2)] .= BCO2
             # Optionnal plots (comment for speed) ##
             if i_inner in tp.n_inner #&& time_step == tp.n_save
-                p = plot(scatter(x = eachindex(B), y = B, mode = "line" ))
-                display(p)
-                pp = plot(scatter(x = zplt*10^6, y = O2, mode = "line"), 
-                Layout(title = "02 concentration profile $time_step",
+                # p = plot(scatter(x = eachindex(B), y = B, mode = "line" ))
+                # display(p)
+                cleanO2 = removezeros(O2)
+                cleanCO2 = removezeros(CO2)
+                file_name_O2 = "O2_profile_$(time_step*i_inner/72)_h.png"
+                file_name_CO2 = "CO2_profile_$(time_step*i_inner/72)_h.png"
+                pp = plot(scatter(x = zplt*10^6, y = cleanO2, mode = "line"), 
+                Layout(title = "02 concentration profile $(time_step*i_inner/72) h",
                 xaxis_title = "Depth (µm)",
-                yaxis_title = "O2 concentration mol/m3"))
-                display(pp)
+                yaxis_title = "O2 concentration mol/m3",
+                xaxis_range = [0,325],
+                yaxis_range = [0.25,0.45]))
+
+                p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
+                Layout(title = "CO2 concentration profile $(time_step*i_inner/72) h",
+                xaxis_title = "Depth (µm)",
+                yaxis_title = "CO2 concentration mol/m3",
+                xaxis_range = [0,325],
+                yaxis_range = [0, 0.28]
+                ))
+                savefig(p, joinpath(save_path_CO2, file_name_CO2))
+                savefig(pp, joinpath(save_path, file_name_O2))
             end
             # # Optionnal plots (comment for speed) ##
             # if i_inner in tp.n_inner #&& time_step == tp.n_save
