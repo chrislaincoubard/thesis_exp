@@ -3,12 +3,12 @@ using CSV
 using DataFrames
 using Statistics
 
-data = CSV.File(raw"C:\Users\Chrislain\Documents\data\rate_photo_Bminus.csv") |> DataFrame
-data2 = CSV.File(raw"C:\Users\Chrislain\Documents\data\rate_photoB+.csv") |> DataFrame
+data = CSV.File(raw"C:\Users\Chrislain\Documents\exp_data\rate_photo_Bminus.csv") |> DataFrame
+data2 = CSV.File(raw"C:\Users\Chrislain\Documents\exp_data\rate_photoB+.csv") |> DataFrame
 
-data_control = CSV.File(raw"C:\Users\Chrislain\Documents\data\control_Oxygen.csv",delim = ";") |> DataFrame
-data_025B = CSV.File(raw"C:\Users\Chrislain\Documents\data\060924_0,5MBicarbonate.csv", header =75, silencewarnings = true, footerskip = 2) |> DataFrame
-data_05B = CSV.File(raw"C:\Users\Chrislain\Documents\data\060924_0,25MBicarbonate.csv", header = 75, silencewarnings = true, footerskip = 2) |> DataFrame
+data_control = CSV.File(raw"C:\Users\Chrislain\Documents\exp_data\control_Oxygen.csv",delim = ";") |> DataFrame
+data_025B = CSV.File(raw"C:\Users\Chrislain\Documents\exp_data\060924_0,5MBicarbonate.csv", header =75, silencewarnings = true, footerskip = 2) |> DataFrame
+data_05B = CSV.File(raw"C:\Users\Chrislain\Documents\exp_data\060924_0,25MBicarbonate.csv", header = 75, silencewarnings = true, footerskip = 2) |> DataFrame
 
 
 println(first(data_025B,5))
@@ -46,19 +46,19 @@ display(p)
 df25 = DataFrame()
 df50 = DataFrame()
 
-df25[!,"0"] = rates_b025[1:301]
-df25[!,"20"] = rates_b025[302:601]
-df25[!,"50"] = rates_b025[602:901]
-df25[!,"100"] = rates_b025[902:1201]
-df25[!,"180"] = rates_b025[1202:1501]
-df25[!,"250"] = rates_b025[1502:1801]
-df25[!,"500"] = rates_b025[1802:2101]
-df25[!,"1000"] = rates_b025[2102:2401]
+# df25[!,"0"] = rates_b025[1:301]
+# df25[!,"20"] = rates_b025[302:601]
+# df25[!,"50"] = rates_b025[602:901]
+# df25[!,"100"] = rates_b025[902:1201]
+# df25[!,"180"] = rates_b025[1202:1501]
+# df25[!,"250"] = rates_b025[1502:1801]
+# df25[!,"500"] = rates_b025[1802:2101]
+# df25[!,"1000"] = rates_b025[2102:2401]
 
-df50[!,"0"] = rates_b05[1:301]
-df50[!,"20"] = rates_b05[302:601]
-df50[!,"50"] = rates_b05[602:901]
-df50[!,""]
+# df50[!,"0"] = rates_b05[1:301]
+# df50[!,"20"] = rates_b05[302:601]
+# df50[!,"50"] = rates_b05[602:901]
+# df50[!,""]
 
 means = mean.(eachcol(data))
 light = parse.(Int64, names(data))

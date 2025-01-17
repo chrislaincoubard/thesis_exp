@@ -64,25 +64,68 @@ function getdiagonals(D, dz, dt, pop)
     return low, diag, up
 end
 
+function getdiagonals_ions(D, dz, dt, pop)
+    ind = findfirst(x -> x == 0, pop) -1
+    coefDiff = D*dt/dz^2
+    diag = fill(1 + 2 * coefDiff, ind)
+    up = fill(-coefDiff, ind-1)
+    low = fill(-coefDiff, ind-1)
+    diag[1] = 1+coefDiff
+    diag[ind] = 1+3*coefDiff
+    return low, diag, up
+end
 
 
-function computeO2source(mu, VO2x, mx, pop, dz)
+function computeSource(mu, Stoech, mx, pop, dz)
     ind = findfirst(x -> x == 0, pop)-1 
     source = zeros(ind)
     for i in 1:ind
-        source[i] = ((mu[i]*(pop[i]/dz)*VO2x)/mx)
+        source[i] = ((mu[i]*(pop[i]/dz)*Stoech)/mx)
     end
     return source
 end
 
-function computeB(O2, O2sat, D, dz, dt, pop,S)
+function computeB_gases(Phi, Phi_surf, D, dz, dt, pop,S)
     ind = findfirst(x -> x == 0, pop) -1 
     B = zeros(ind)
     for i in 1:ind
-    B[i] = O2[i] + S[i] * dt
+    B[i] = Phi[i] + S[i] * dt
     end
-    B[1] += 2 * dt * D * O2sat / dz^2
-    B[ind] += 2 * dt * D * O2sat / dz^2
+    B[1] += 2 * dt * D * Phi_surf / dz^2
+    B[ind] += 2 * dt * D * Phi_surf / dz^2
+    return B
+end
+
+function computeB_gases_test(Phi, Phi_surf, D, dz, dt, pop,S)
+    ind = findfirst(x -> x == 0, pop) -1 
+    B = zeros(ind)
+    for i in 1:ind
+    B[i] = Phi[i]
+    end
+    B[1] += 2 * dt * D * Phi_surf / dz^2
+    B[ind] += 2 * dt * D * Phi_surf / dz^2
+    return B
+end
+
+function computeB_ions(Phi, Phi_surf, D, dz, dt, pop,S)
+    ind = findfirst(x -> x == 0, pop) -1 
+    B = zeros(ind)
+    for i in 1:ind
+    B[i] = Phi[i] + S[i] * dt
+    # B[i] = Phi[i]
+    end
+    B[ind] += 2 * dt * D * Phi_surf / dz^2
+    return B
+end
+
+function computeBC(Phi, Phi_surf, D, dz, dt, pop,S)
+    ind = findfirst(x -> x == 0, pop) -1 
+    B = zeros(ind)
+    for i in 1:ind
+    B[i] = Phi[i]
+    end
+    B[1] += 2 * dt * D * Phi_surf / dz^2
+    B[ind] += 2 * dt * D * Phi_surf / dz^2
     return B
 end
 

@@ -1,12 +1,9 @@
 using Parameters
 
 @with_kw struct TimeParams @deftype Number
-    t_tot = 7*86400 #(s)
-    dt = 50
-    n_iter::Int = round(Int, t_tot/dt)
-    n_save = 168
-    n_inner::Int = n_iter/n_save
-    sub = 1e-3
+    t_tot = 7*24 #(h)
+    dt = 50 #(s)
+    n_inner::Int = 3600/dt
 end
 
 @with_kw struct SpaceParams @deftype Number
@@ -31,16 +28,26 @@ end
 end
 
 @with_kw struct GasesParams @deftype Number
-    D_oxygen = 0.68*1.99e-9 #coef de diffusion de l'O2 dans le biofilm = 68% du coef de diffusion de l'O2 dans l'eau (m/s)
-    D_CO2 = 1.18e-9 #coefficient de diffusion du CO2 assimilé aà celui des ions bicarbonate
+    D_oxygen = 0.68*1.99e-9 #coef de diffusion de l'O2 dans le biofilm = 68% du coef de diffusion de l'O2 dans l'eau (m2/s)
+    D_CO2 = 1.18e-9 #coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
     O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
+    H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
+    PP_CO2 = 4.4e-1 #partial pressure of CO2 in air (mol/L)
+    CO2_surf = H_constant_CO2 * PP_CO2
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
+    VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
-    u = 5.4e-6 # Velocity of O2 (m/s)
-    PCo2 = 1.013 #partial pressure of Co2 in air (KPa)
-    HCo2 = 0.042 #Henry's constant for CO2 (mol/m3/KPa)
-    ka1 = 10^(-6.3) #dissociation coefficient of carbonic acid
-    ka2 = 10^(-10.3) #dissociation coefficient of bicabronate ion
-    phs = 7 #pH de surface du Biofilm
-    
+    ka1_co2 = 4.46e-7 #dissociation coefficient of CO2
+    ka2_co2 = 4.68e-11 #dissociation coefficient of HCO3-
+    ka2_h3po4 = 6.2e-8 #dissociation coefficient of H2PO4-
+    ka3_h3po4 = 4.8e-13 #dissociation coefficient of HPO42-
+    kw = 1e-14
+end
+
+@with_kw struct Ions_params @deftype Number
+    D_NO3 = 1.9e-9 #Diffusion coefficient of nitrate in water (m2/s)
+    C_NO3 = 8.8 #Concentration de nitrate dans le milieu (mol/m3)
+    C_PO4 = 4.3e-1 #Concentration dans le milieu de culture (mol/m3)
+    VN_X = -0.16
+
 end
