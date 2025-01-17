@@ -23,15 +23,23 @@ nz = Int64(1e3)
 dz = z/nz
 zplt = 0:dz:z
 time_save = zeros(tp.t_tot)
+save_path_data = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_data")
 save_path = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_O2_clean_test")
 save_path_CO2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_CO2_clean_test")
 save_path_N = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_N03_test")
+
 
 @time begin
 for I0 in light_intensities
     ##Initialize Array
     df_height = DataFrame()
     df = DataFrame()
+    df_mu, df_mu_gross, df_R = DataFrame(), DataFrame(), DataFrame() 
+    df_O2, df_CO2, df_NO3, df_PO2 = DataFrame(), DataFrame(), DataFrame(), DataFrame()
+    filename_O2 = "model_O2_$I0.csv"
+    filename_CO2 = "model_CO2_$I0.csv"
+    filename_N = "model_N_$I0.csv"
+    filename_P = "model_P_$I0.csv"
     light = zeros(nz)
     µ, µ_gross, R = zeros(nz), zeros(nz), zeros(nz)
     mean_mu, height = zeros(tp.t_tot), zeros(tp.t_tot)
@@ -39,13 +47,14 @@ for I0 in light_intensities
     X0 = hmp.rho * dz
     O2, CO2, NO3, H2PO4 = zeros(nz), zeros(nz), zeros(nz), zeros(nz)
     pop[1:25] .= X0
-    println("sum pop start = $(sum(pop))")
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
     @time for time_step in 1:tp.t_tot
-        println("Start $time_step")
+        
+        # println("Start $time_step")
         for i_inner in 1:tp.n_inner
             ## Compute growth ##
+            # println("Start $i_inner for $time_step" )
             computelight!(light, I0, hmp.ke, dz, pop)
             grossmu!(µ_gross, light, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, pop)
             respiration!(R, light, hmp.RD, hmp.RL, hmp.Ik, hmp.n, pop)
@@ -81,9 +90,15 @@ for I0 in light_intensities
             #     yaxis_title = "CO2 concentration mol/m3"))
             #     display(pp)
             # end
+            
         end
         # p = plot(scatter(x = eachindex(SO2), y = SO2, mode = "line" ))
         # display(p)
+        
+    
+        df_O2[!, "$time_step"] = copy(O2)
+        df_CO2[!,"$time_step"] = copy(CO2)
+        df_NO3[!, "$time_step"] = copy(NO3)
         cleanO2 = removezeros(O2)
         cleanmu = removezeros(µ)
         cleanCO2 = removezeros(CO2)
@@ -100,42 +115,45 @@ for I0 in light_intensities
         # yaxis_range = [0.25,0.45],
         # yaxis2 = attr(title = "Growth rate", overlaying = "y", side = "right")))
 
-        pp = plot([scatter(x = zplt*10^6, y = cleanO2, mode = "line", name = "O2")], 
-        Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time_step) hours",
-        xaxis_title = "Depth (µm)",
-        yaxis_title = "O2 concentration mol/m<sup>3</sup>",
-        xaxis_range = [0,325],
-        yaxis_range = [0.25,0.45]))
+        # pp = plot([scatter(x = zplt*10^6, y = cleanO2, mode = "line", name = "O2")], 
+        # Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time_step) hours",
+        # xaxis_title = "Depth (µm)",
+        # yaxis_title = "O2 concentration mol/m<sup>3</sup>",
+        # xaxis_range = [0,325],
+        # yaxis_range = [0.25,0.45]))
         # display(pp)
 
-        p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
-        Layout(title = "CO2 concentration profile $(time_step) h",
-        xaxis_title = "Depth (µm)",
-        yaxis_title = "CO2 concentration mol/m3",
-        # xaxis_range = [0,325],
-        # yaxis_range = [0, 0.28]
-        ))
-        # display(p)
-        p_n = plot(scatter(x = zplt*10^6, y= cleanN, mode = "line"),
-        Layout(title = "NO3 concentration profile $(time_step) h",
-        xaxis_title = "Depth (µm)",
-        yaxis_title = "NO3 concentration mol/m3",
-        # xaxis_range = [0,325],
-        # yaxis_range = [0, 0.28]
-        ))
-        display(p)
-        savefig(p, joinpath(save_path_CO2, file_name_CO2))
-        savefig(pp, joinpath(save_path, file_name_O2))
-        savefig(p_n, joinpath(save_path_N, file_name_NO3))
+        # p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
+        # Layout(title = "CO2 concentration profile $(time_step) h",
+        # xaxis_title = "Depth (µm)",
+        # yaxis_title = "CO2 concentration mol/m3",
+        # # xaxis_range = [0,325],
+        # # yaxis_range = [0, 0.28]
+        # ))
+        # # display(p)
+        # p_n = plot(scatter(x = zplt*10^6, y= cleanN, mode = "line"),
+        # Layout(title = "NO3 concentration profile $(time_step) h",
+        # xaxis_title = "Depth (µm)",
+        # yaxis_title = "NO3 concentration mol/m3",
+        # # xaxis_range = [0,325],
+        # # yaxis_range = [0, 0.28]
+        # ))
+        # display(pp)
+        # savefig(p, joinpath(save_path_CO2, file_name_CO2))
+        # savefig(pp, joinpath(save_path, file_name_O2))
+        # savefig(p_n, joinpath(save_path_N, file_name_NO3))
         time = time_step
         currheight = sum(pop) / hmp.rho
         time_save[time_step] = time
         height[time_step] = currheight
         mu_no_zeros = removezeros(µ)
-        mean_mu[time_step] = mean(mu_no_zeros)
-        
+        mean_mu[time_step] = mean(mu_no_zeros)        
     end
     #save data at some time points in DataFrame
+    
+    CSV.write(joinpath(save_path_data,filename_O2), df_O2)
+    CSV.write(joinpath(save_path_data,filename_CO2), df_CO2)
+    CSV.write(joinpath(save_path_data,filename_N), df_NO3)
     clean_R = removezeros(R)
     clean_µ = removezeros(µ)
     clean_grossµ = removezeros(µ_gross)
@@ -148,8 +166,6 @@ for I0 in light_intensities
     df_height[!,"Height"] = height
     df_height[!,"Intensity"] .= I0
     df_height[!, "time"] .= time_save
-    println(length(mean_mu))
-    println(length(height))
     df_height[!,"mean_mu"] .= mean_mu
 
     #Export dataframe
@@ -162,7 +178,7 @@ for I0 in light_intensities
 end
 end
 println("Done with calculation")
-println(raw"Data is saved at C:\Users\Chrislain\Documents\Results\result_model")
+println("Data is saved at $(save_path_data)")
 
 
 

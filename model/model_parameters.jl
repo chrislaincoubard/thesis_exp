@@ -2,7 +2,7 @@ using Parameters
 
 @with_kw struct TimeParams @deftype Number
     t_tot = 7*24 #(h)
-    dt = 50 #(s)
+    dt = 1 #(s)
     n_inner::Int = 3600/dt
 end
 
@@ -29,10 +29,10 @@ end
 
 @with_kw struct GasesParams @deftype Number
     D_oxygen = 0.68*1.99e-9 #coef de diffusion de l'O2 dans le biofilm = 68% du coef de diffusion de l'O2 dans l'eau (m2/s)
-    D_CO2 = 1.18e-9 #coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
+    D_CO2 = 1.9e-9 #coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
     O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
     H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
-    PP_CO2 = 4.4e-1 #partial pressure of CO2 in air (mol/L)
+    PP_CO2 = 1.95e-5 #partial pressure of CO2 in air (mol/L)
     CO2_surf = H_constant_CO2 * PP_CO2
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
     VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
@@ -45,7 +45,7 @@ end
 end
 
 @with_kw struct Ions_params @deftype Number
-    D_NO3 = 1.9e-9 #Diffusion coefficient of nitrate in water (m2/s)
+    D_NO3 = 1.7e-9 #Diffusion coefficient of nitrate in water (m2/s)
     C_NO3 = 8.8 #Concentration de nitrate dans le milieu (mol/m3)
     C_PO4 = 4.3e-1 #Concentration dans le milieu de culture (mol/m3)
     VN_X = -0.16
