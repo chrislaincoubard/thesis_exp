@@ -96,17 +96,6 @@ function computeB_gases(Phi, Phi_surf, D, dz, dt, pop,S)
     return B
 end
 
-function computeB_gases_test(Phi, Phi_surf, D, dz, dt, pop,S)
-    ind = findfirst(x -> x == 0, pop) -1 
-    B = zeros(ind)
-    for i in 1:ind
-    B[i] = Phi[i]
-    end
-    B[1] += 2 * dt * D * Phi_surf / dz^2
-    B[ind] += 2 * dt * D * Phi_surf / dz^2
-    return B
-end
-
 function computeB_ions(Phi, Phi_surf, D, dz, dt, pop,S)
     ind = findfirst(x -> x == 0, pop) -1 
     B = zeros(ind)
@@ -118,16 +107,6 @@ function computeB_ions(Phi, Phi_surf, D, dz, dt, pop,S)
     return B
 end
 
-function computeBC(Phi, Phi_surf, D, dz, dt, pop,S)
-    ind = findfirst(x -> x == 0, pop) -1 
-    B = zeros(ind)
-    for i in 1:ind
-    B[i] = Phi[i]
-    end
-    B[1] += 2 * dt * D * Phi_surf / dz^2
-    B[ind] += 2 * dt * D * Phi_surf / dz^2
-    return B
-end
 
 function calcexcess(arr, X)
     n = length(arr)
