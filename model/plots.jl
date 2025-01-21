@@ -29,26 +29,26 @@ for time in names(df_O2)
         xaxis_range = [0,325],
         yaxis_range = [0.25,0.45]))
     # display(p)
-    savefig(p, joinpath(save_path, file_name_O2))
+    savefig(p, joinpath(save_path_O2, file_name_O2))
 end
 
 for time in names(df_CO2)
     filename_CO2 = "CO2_profile_$(time)_h.png"
     cleanCO2 = removezeros(df_CO2[!,time])
-    p = plot(scatter(x = zplt*10^6, y= cleanCO2, mode = "line"),
+    p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
         Layout(title = "CO2 concentration profile $(time) h",
         xaxis_title = "Depth (µm)",
         yaxis_title = "CO2 concentration mol/m3"))
-    display(p)
-    savefig(p, joinpath(save_path, filename_CO2))
+    # display(p)
+    savefig(p, joinpath(save_path_CO2, filename_CO2))
 end
 
 for time in names(df_N)
     filename_N = "NO3_profile_$(time)_h.png"
     cleanN = removezeros(df_N[!,time])
-    p = plot(scatter(x = zplt*10^6, y= cleanN, mode = "line"),
+    p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
         Layout(title = "NO3 concentration profile $(time) h",
         xaxis_title = "Depth (µm)",
         yaxis_title = "NO3 concentration mol/m3"))
-    savefig(p, joinpath(save_path, filename_N))
+    savefig(p, joinpath(save_path_N, filename_N))
 end
