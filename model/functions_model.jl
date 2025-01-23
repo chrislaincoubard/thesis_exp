@@ -85,6 +85,7 @@ function computeSource(mu, Stoech, mx, pop, dz)
     return source
 end
 
+
 function computeB_gases(Phi, Phi_surf, D, dz, dt, pop,S)
     ind = findfirst(x -> x == 0, pop) -1 
     B = zeros(ind)
@@ -117,4 +118,26 @@ function calcexcess(arr, X)
         end
     end
     return total_excess
+end
+
+function make_B(NO3, H2PO4)
+    NO3_clean = removezeros(NO3)
+    H2PO4_clean = removezeros(H2PO4)
+    B = []
+    for (N, P) in zip(NO3_clean, H2PO4_clean)
+        b = -(N + P)
+        push!(B, b)
+    end
+    return B
+end
+
+function make_C(H2PO4, CO2, KI, KII, QI, QII, Kw)
+    H2PO4_clean = removezeros(H2PO4)
+    CO2_clean = removezeros(CO2)
+    Carr = []
+    for (P, C) in zip(H2PO4_clean, CO2_clean)
+        c = -(KI*C + 2*KI*KII*C + 2*QI*P + 3*QI*QII*P + Kw)
+        push!(Carr, c)
+    end
+    return Carr
 end

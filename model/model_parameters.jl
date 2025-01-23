@@ -29,25 +29,28 @@ end
 
 @with_kw struct GasesParams @deftype Number
     D_oxygen = 0.68*1.99e-9 #coef de diffusion de l'O2 dans le biofilm = 68% du coef de diffusion de l'O2 dans l'eau (m2/s)
-    D_CO2 = 1.9e-9 #coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
+    D_CO2 = 1.9e-9#coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
     O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
     H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
-    PP_CO2 = 1.95e-5 #partial pressure of CO2 in air (mol/L)
+    PP_CO2 = 4.4e-4 #partial pressure of CO2 in air (atm)
     CO2_surf = H_constant_CO2 * PP_CO2
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
-    VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
+    VCO2_x = 1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
     ka1_co2 = 4.46e-7 #dissociation coefficient of CO2
     ka2_co2 = 4.68e-11 #dissociation coefficient of HCO3-
-    ka2_h3po4 = 6.2e-8 #dissociation coefficient of H2PO4-
-    ka3_h3po4 = 4.8e-13 #dissociation coefficient of HPO42-
-    kw = 1e-14
+    
 end
 
 @with_kw struct Ions_params @deftype Number
     D_NO3 = 1.7e-9 #Diffusion coefficient of nitrate in water (m2/s)
+    D_H2PO4 = 0.846e-9 #Diffusion coefficient of phosphate ion in water (m2/s)
     C_NO3 = 8.8 #Concentration de nitrate dans le milieu (mol/m3)
-    C_PO4 = 4.3e-1 #Concentration dans le milieu de culture (mol/m3)
+    C_H2PO4 = 4.3e-1 #Concentration dans le milieu de culture (mol/m3)
+    ka1_h3po4 = 6.2e-8 #dissociation coefficient of H2PO4-
+    ka2_h3po4 = 4.8e-13 #dissociation coefficient of PO43-
+    kw = 1e-14
     VN_X = -0.16
+    VP_X = -0.007
 
 end
