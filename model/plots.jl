@@ -33,55 +33,54 @@ df_pH2 = df_pH[:, r"^B_"]
 
 
 
-# for time in names(df_O2)
-#     file_name_O2 = "O2_profile_$(time)_h.png"
-#     cleanO2 = removezeros(df_O2[!,time])
-#     p = plot([scatter(x = 0:1000, y = cleanO2, mode = "line", name = "O2")], 
-#         Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "O2 concentration mol/m<sup>3</sup>",
-#         xaxis_range = [0,325],
-#         yaxis_range = [0.25,0.45]))
-#     # display(p)
-#     savefig(p, joinpath(save_path_O2, file_name_O2))
-# end
+for time in names(df_O2)
+    file_name_O2 = "O2_profile_$(time)_h.png"
+    cleanO2 = removezeros(df_O2[!,time])
+    p = plot([scatter(x = 0:1000, y = cleanO2, mode = "line", name = "O2")], 
+        Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
+        xaxis_title = "Depth (µm)",
+        yaxis_title = "O2 concentration mol/m<sup>3</sup>",
+        xaxis_range = [0,325],
+        yaxis_range = [0.25,0.45]))
+    # display(p)
+    savefig(p, joinpath(save_path_O2, file_name_O2))
+end
 
-# for time in names(df_CO2)
-#     filename_CO2 = "CO2_profile_$(time)_h.png"
-#     cleanCO2 = removezeros(df_CO2[!,time])
-#     p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
-#         Layout(title = "CO2 concentration profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "CO2 concentration mol/m3"))
-#     # display(p)
-#     savefig(p, joinpath(save_path_CO2, filename_CO2))
-# end
+for time in names(df_CO2)
+    filename_CO2 = "CO2_profile_$(time)_h.png"
+    cleanCO2 = removezeros(df_CO2[!,time])
+    p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
+        Layout(title = "CO2 concentration profile $(time) h",
+        xaxis_title = "Depth (µm)",
+        yaxis_title = "CO2 concentration mol/m3",
+        xaxis_range = [0,325]))
+    # display(p)
+    savefig(p, joinpath(save_path_CO2, filename_CO2))
+end
 
-# for time in names(df_N)
-#     filename_N = "NO3_profile_$(time)_h.png"
-#     cleanN = removezeros(df_N[!,time])
-#     p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
-#         Layout(title = "NO3 concentration profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "NO3 concentration mol/m3"))
-#     savefig(p, joinpath(save_path_N, filename_N))
-# end
+for time in names(df_N)
+    filename_N = "NO3_profile_$(time)_h.png"
+    cleanN = removezeros(df_N[!,time])
+    p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
+        Layout(title = "NO3 concentration profile $(time) h",
+        xaxis_title = "Depth (µm)",
+        yaxis_title = "NO3 concentration mol/m3"))
+    savefig(p, joinpath(save_path_N, filename_N))
+end
 
-# for time in names(df_P)
-#     filename_P = "P_profile_$(time)_h.png"
-#     cleanN = removezeros(df_N[!,time])
-#     p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
-#         Layout(title = "P concentration profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "P concentration mol/m3"))
-#     savefig(p, joinpath(save_path_P, filename_P))
-# end
+for time in names(df_P)
+    filename_P = "P_profile_$(time)_h.png"
+    cleanN = removezeros(df_N[!,time])
+    p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
+        Layout(title = "P concentration profile $(time) h",
+        xaxis_title = "Depth (µm)",
+        yaxis_title = "P concentration mol/m3"))
+    savefig(p, joinpath(save_path_P, filename_P))
+end
 
 for time in names(df_pH1)
     filename_pH = "pH1_profile_$(time)_h.png"
-    println(typeof(time))
     cleanN = removezeros(df_pH[!,"$time"])
-    println("yes")
     p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
         Layout(title = "Ph1 profile $(time) h",
         xaxis_title = "Depth (µm)",

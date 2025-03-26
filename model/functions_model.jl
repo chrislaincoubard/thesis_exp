@@ -1,6 +1,5 @@
-function computelight!(arrLight, I0, ke, dz,pop)
+function computelight!(arrLight, I0, ke, dz, ind)
     arrLight[1] = I0
-    ind = findfirst(x -> x == 0, pop)
     for i in 2:ind
         arrLight[i] = I0 * exp(-ke*(dz*i))
     end 
@@ -13,23 +12,20 @@ function updateheight!(pop,µ,dt)
     end
 end
 
-function grossmu!(µ_gross, I, k, sigma, tau, kd, kr, pop)
-    ind = findfirst(x->x==0, pop)
+function grossmu!(µ_gross, I, k, sigma, tau, kd, kr, ind)
     for i in 1:ind
         µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
     end
 end
 
-function respiration!(R, I, RD, RL, Ik, n, pop)
-    ind = findfirst(x->x==0, pop)
+function respiration!(R, I, RD, RL, Ik, n, ind)
     for i in 1:ind
         R[i] = RD + (RL-RD)*(I[i]^n/(I[i]^n+Ik^n))
         # R[i] = 0.12/86400
     end
 end
 
-function updatemu!(µ,gross_µ, R, pop)
-    ind = findfirst(x -> x == 0, pop)
+function updatemu!(µ,gross_µ, R, ind)
     for i in 1:ind
         µ[i] =  gross_µ[i] - R[i]
     end
@@ -53,8 +49,7 @@ function smootharray!(arr, X)
     end
 end
 
-function getdiagonals(D, dz, dt, pop)
-    ind = findfirst(x -> x == 0, pop) -1
+function getdiagonals(D, dz, dt, ind)
     coefDiff = D*dt/dz^2
     diag = fill(1 + 2 * coefDiff, ind)
     up = fill(-coefDiff, ind-1)
@@ -64,8 +59,7 @@ function getdiagonals(D, dz, dt, pop)
     return low, diag, up
 end
 
-function getdiagonals_ions(D, dz, dt, pop)
-    ind = findfirst(x -> x == 0, pop) -1
+function getdiagonals_ions(D, dz, dt, ind)
     coefDiff = D*dt/dz^2
     diag = fill(1 + 2 * coefDiff, ind)
     up = fill(-coefDiff, ind-1)
@@ -76,8 +70,7 @@ function getdiagonals_ions(D, dz, dt, pop)
 end
 
 
-function computeSource(mu, Stoech, mx, pop, dz)
-    ind = findfirst(x -> x == 0, pop)-1 
+function computeSource(mu, Stoech, mx, dz,pop, ind)
     source = zeros(ind)
     for i in 1:ind
         source[i] = ((mu[i]*(pop[i]/dz)*Stoech)/mx)
@@ -86,8 +79,7 @@ function computeSource(mu, Stoech, mx, pop, dz)
 end
 
 
-function computeB_gases(Phi, Phi_surf, D, dz, dt, pop,S)
-    ind = findfirst(x -> x == 0, pop) -1 
+function computeB_gases(Phi, Phi_surf, D, dz, dt, S, ind)
     B = zeros(ind)
     for i in 1:ind
     B[i] = Phi[i] + S[i] * dt
@@ -97,8 +89,7 @@ function computeB_gases(Phi, Phi_surf, D, dz, dt, pop,S)
     return B
 end
 
-function computeB_ions(Phi, Phi_surf, D, dz, dt, pop,S)
-    ind = findfirst(x -> x == 0, pop) -1 
+function computeB_ions(Phi, Phi_surf, D, dz, dt, S, ind)
     B = zeros(ind)
     for i in 1:ind
     B[i] = Phi[i] + S[i] * dt

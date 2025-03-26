@@ -17,7 +17,7 @@ end
     ke = 11650 #biofilm light extinction coefficient (m-1)
     k = 4.9e-6 #scaling factor, linking the rate of photons capture (s*s-1) 
     kr = 1.16e-3 #repair rate (s-1)
-    kd = 0.15#damage rate (dimentionless)
+    kd = 0.15 #damage rate (dimentionless)
     tau = 1.06e-3 #turnover time electron transfer chain (s-1)
     sigma = 1.59e-2 #cross section of PSII (m2*µmol-1)
     n = 3 #switching rate between RL and RD (dimentionless)
@@ -35,7 +35,7 @@ end
     PP_CO2 = 4.4e-4 #partial pressure of CO2 in air (atm)
     CO2_surf = H_constant_CO2 * PP_CO2
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
-    VCO2_x = 1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
+    VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
     ka1_co2 = 4.46e-7 #dissociation coefficient of CO2
     ka2_co2 = 4.68e-11 #dissociation coefficient of HCO3-
