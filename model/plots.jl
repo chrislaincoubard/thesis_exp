@@ -45,8 +45,8 @@ df_mu = dfs["model_mu_200.csv"]
 
 for time in names(df_O2)
     file_name_O2 = "O2_profile_$(time)_h.png"
-    # cleanO2 = removezeros(df_O2[!,time])
-    p = plot([scatter(x = 0:1000, y = df_O2[!,time], mode = "line", name = "O2")], 
+    cleanO2 = removezeros(df_O2[!,time])
+    p = plot([scatter(x = 0:1000, y = cleanO2, mode = "line", name = "O2")], 
         Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
         xaxis_title = "Depth (µm)",
         yaxis_title = "O2 concentration mol/m<sup>3</sup>",
@@ -58,8 +58,8 @@ end
 
 for time in names(df_CO2)
     filename_CO2 = "CO2_profile_$(time)_h.png"
-    # cleanCO2 = removezeros(df_CO2[!,time])
-    p = plot(scatter(x = 0:1000, y= df_CO2[!,time], mode = "line"),
+    cleanCO2 = removezeros(df_CO2[!,time])
+    p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
         Layout(title = "CO2 concentration profile $(time) h",
         xaxis_title = "Depth (µm)",
         yaxis_title = "CO2 concentration mol/m3",
@@ -100,8 +100,8 @@ end
 
 for time in names(df_mu)
     filename_mu = "mu_profile_$(time)_h.png"
-    # cleanmu = removezeros(df_mu[!,"$time"])
-    p = plot(scatter(x = 0:1000, y = df_mu[!,"$time"].*86400, mode = "line"),
+    cleanmu = removezeros(df_mu[!,"$time"])
+    p = plot(scatter(x = 0:1000, y = cleanmu.*86400, mode = "line"),
     Layout(title = "Mu profile $(time) h",
     xaxis_title = "Depth (µm)",
     yaxis_title = "mu (d-1)"))
