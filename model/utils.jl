@@ -22,3 +22,10 @@ function solve_quadratic(a, b, c)
     end
     return (root1, root2)
 end
+
+function solve_third_degree(a, b, c, d)
+    #solve H^3 + pH^2 + qH + r = 0
+    poly = Polynomial([d, c, b, a])
+    result = roots(poly)
+    real_roots = filter(isreal, roots)
+end

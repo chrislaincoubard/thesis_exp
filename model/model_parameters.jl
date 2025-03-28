@@ -33,7 +33,7 @@ end
     O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
     H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
     PP_CO2 = 4.4e-4 #partial pressure of CO2 in air (atm)
-    CO2_surf = H_constant_CO2 * PP_CO2
+    CO2_surf = H_constant_CO2 * PP_CO2 * 1000 #(mol/m3)
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
     VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)

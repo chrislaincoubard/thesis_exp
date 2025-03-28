@@ -27,7 +27,7 @@ zplt = 0:dz:z
 time_save = zeros(tp.t_tot)
 
 #To change depending of the machine
-save_path_data = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_data_test")
+save_path_data = mkpath(raw"C:\Users\Chrislain\Documents\Results\model_data_test_3")
 
 
 @time begin
@@ -66,7 +66,7 @@ for I0 in light_intensities
             ## Compute growth ##
             ind = findfirst(x -> x == 0, pop) -1
             computelight!(light, I0, hmp.ke, dz, ind)
-            grossmu!(µ_gross, light, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, ind)
+            grossmu2!(µ_gross, light, hmp.k, hmp.sigma, hmp.tau, hmp.kd, hmp.kr, ind, CO2)
             respiration!(R, light, hmp.RD, hmp.RL, hmp.Ik, hmp.n, ind)
             netmu!(µ, µ_gross, R, ind)
             pop .= solvematrix(µ, tp.dt, pop)
@@ -95,6 +95,7 @@ for I0 in light_intensities
             
             O2[1:length(B)] .= B
             CO2[1:length(BCO2)] .= BCO2
+            CO2 .= max.(CO2, 0)
             NO3[1:length(BNO3)] .= BNO3
             H2PO4[1:length(BH2PO4)] .= BH2PO4
             # B = make_B(NO3, H2PO4)

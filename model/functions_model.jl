@@ -14,9 +14,25 @@ end
 
 function grossmu!(µ_gross, I, k, sigma, tau, kd, kr, ind)
     for i in 1:ind
+        # if CO2[i] != 0 
+        #     µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
+        # else
+        #     µ_gross[i] = 0
+        # end
         µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
     end
 end
+
+function grossmu2!(µ_gross, I, k, sigma, tau, kd, kr, ind,CO2)
+    for i in 1:ind
+        if CO2[i] == 0 
+            µ_gross[i] = 0
+        else
+            µ_gross[i] = (k*sigma*I[i]) / (1 + tau*sigma*I[i] + (kd/kr)*tau*(sigma*I[i])^2)
+        end
+    end
+end
+
 
 function respiration!(R, I, RD, RL, Ik, n, ind)
     for i in 1:ind
@@ -25,9 +41,9 @@ function respiration!(R, I, RD, RL, Ik, n, ind)
     end
 end
 
-function updatemu!(µ,gross_µ, R, ind)
+function netmu!(µ,gross_µ, R, ind)
     for i in 1:ind
-        µ[i] =  gross_µ[i] - R[i]
+        µ[i] =  (gross_µ[i] - R[i])
     end
 end
 
@@ -54,8 +70,8 @@ function getdiagonals(D, dz, dt, ind)
     diag = fill(1 + 2 * coefDiff, ind)
     up = fill(-coefDiff, ind-1)
     low = fill(-coefDiff, ind-1)
-    diag[1] = 1+3*coefDiff
-    diag[ind] = 1+3*coefDiff
+    diag[1] = 1 + 3*coefDiff
+    diag[ind] = 1 + 3*coefDiff
     return low, diag, up
 end
 
@@ -131,4 +147,16 @@ function make_C(H2PO4, CO2, KI, KII, QI, QII, Kw)
         push!(Carr, c)
     end
     return Carr
+end
+
+function compute_pH(kI, kII, QI, QII, kw, CO2, NO3, H2PO4, ind)
+    p = 2*QI
+    q = 2*kI*kII
+    r = 3*QI*QII
+    for i in 1:ind
+        b = -(NO3[i] + H2PO4[i])
+        c = -(kI * CO2[i] + p*H2PO4[i] + kw)
+        d = -(q * CO2[i] + r * H2PO4[i])
+        sol = solve_third_degree(d,c,b,1)
+    end
 end
