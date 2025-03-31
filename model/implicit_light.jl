@@ -19,7 +19,7 @@ tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
 ip = Ions_params()
-light_intensities = [200]
+light_intensities = [50,100,200,300,400,800]
 z = 1e-3
 nz = Int64(1e3)
 dz = z/nz
@@ -39,6 +39,7 @@ for I0 in light_intensities
     df_O2, df_CO2, df_NO3, df_H2PO4 = DataFrame(), DataFrame(), DataFrame(), DataFrame()
     df_H = DataFrame()
     df_pH = DataFrame()
+    df_pop = DataFrame()
     filename_O2 = "model_O2_$I0.csv"
     filename_CO2 = "model_CO2_$I0.csv"
     filename_N = "model_N_$I0.csv"
@@ -48,6 +49,7 @@ for I0 in light_intensities
     filename_R = "model_R_$I0.csv"
     filename_H = "model_H_$I0.csv"
     filename_pH = "model_pH_$I0.csv"
+    filename_pop = "model_pop_$I0.csv"
     light = zeros(nz)
     µ, µ_gross, R = zeros(nz), zeros(nz), zeros(nz)
     mean_mu, height = zeros(tp.t_tot), zeros(tp.t_tot)
@@ -120,6 +122,7 @@ for I0 in light_intensities
         df_mu[!,"$time_step"] = copy(µ)
         df_mu_gross[!, "$time_step"] = copy(µ_gross)
         df_R[!,"$time_step"] = copy(R)
+        df_pop[!,"$time_step"] = copy(pop)
     end
     #Export data in CSV format
     CSV.write(joinpath(save_path_data,filename_O2), df_O2)
@@ -129,6 +132,7 @@ for I0 in light_intensities
     CSV.write(joinpath(save_path_data, filename_µ),df_mu)
     CSV.write(joinpath(save_path_data, filename_µgross), df_mu_gross)
     CSV.write(joinpath(save_path_data, filename_R), df_R)
+    CSV.write(joinpath(save_path_data, filename_pop), df_pop)
     # CSV.write(joinpath(save_path_data, filename_H), df_H)
     # CSV.write(joinpath(save_path_data, filename_pH), df_pH)
 end

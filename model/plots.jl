@@ -23,7 +23,7 @@ save_path_N = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_2\model_N_pl
 save_path_P = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_2\model_P_plots")
 # save_path_pH1 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph1")
 # save_path_pH2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph2")
-save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\plots_2\model_mu_test")
+save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\plots_2\model_mu_test_2")
 
 
 
@@ -33,14 +33,35 @@ df_O2 = dfs["model_O2_200.csv"]
 df_CO2 = dfs["model_CO2_200.csv"]
 df_N = dfs["model_N_200.csv"]
 df_P = dfs["model_P_200.csv"]
+df_mu = dfs["model_mu_200.csv"]
+df_pop_50 = dfs["model_pop_50.csv"]
+df_pop_100 = dfs["model_pop_100.csv"]
+df_pop_200 = dfs["model_pop_200.csv"]
+df_pop_300 = dfs["model_pop_300.csv"]
+df_pop_400 = dfs["model_pop_400.csv"]
+df_pop_800 = dfs["model_pop_800.csv"]
+
+df_mu_50 = dfs["model_mu_50.csv"]
+df_mu_100 = dfs["model_mu_100.csv"]
+df_mu_200 = dfs["model_mu_200.csv"]
+df_mu_300 = dfs["model_mu_300.csv"]
+df_mu_400 = dfs["model_mu_400.csv"]
+df_mu_800 = dfs["model_mu_800.csv"]
+
+dfs_mu = [dfs["model_mu_50.csv"], dfs["model_mu_100.csv"], dfs["model_mu_200.csv"], dfs["model_mu_300.csv"], dfs["model_mu_400.csv"], dfs["model_mu_800.csv"]]
 # df_H = dfs["model_H_200.csv"]
 # df_H1 = df_H[:,r"^H1"]
 # df_H2 = df_H[:,r"^H2"]
 # df_pH = dfs["model_pH_200.csv"]
 # df_pH1 = df_pH[:, r"^A_"]
 # df_pH2 = df_pH[:, r"^B_"]
-df_mu = dfs["model_mu_200.csv"]
 
+# height_50 = []
+
+# for time in names(df_pop_50)
+#     filename_pop = "population_$(time)_h.png"
+#     non_zeros = count(!iszero, df_pop[!,time])
+# end
 
 
 for time in names(df_O2)
@@ -63,7 +84,8 @@ for time in names(df_CO2)
         Layout(title = "CO2 concentration profile $(time) h",
         xaxis_title = "Depth (µm)",
         yaxis_title = "CO2 concentration mol/m3",
-        xaxis_range = [0,325]))
+        xaxis_range = [0,325],
+        yaxis_range = [-0.05,0.16]))
     # display(p)
     savefig(p, joinpath(save_path_CO2, filename_CO2))
 end
@@ -100,8 +122,19 @@ end
 
 for time in names(df_mu)
     filename_mu = "mu_profile_$(time)_h.png"
-    cleanmu = removezeros(df_mu[!,"$time"])
-    p = plot(scatter(x = 0:1000, y = cleanmu.*86400, mode = "line"),
+    cleanmu_50 = removezeros(df_mu_50[!,"$time"])
+    cleanmu_100 = removezeros(df_mu_100[!,"$time"])
+    cleanmu_200 = removezeros(df_mu_200[!,"$time"])
+    cleanmu_300 = removezeros(df_mu_300[!,"$time"])
+    cleanmu_400 = removezeros(df_mu_400[!,"$time"])
+    cleanmu_800 = removezeros(df_mu_800[!,"$time"])
+    p = plot(
+        [scatter(x = 0:1000, y = cleanmu_50.*86400, mode = "line",name = "50"),
+        scatter(x = 0:1000, y = cleanmu_100.*86400, mode = "line",name = "100"),
+        scatter(x = 0:1000, y = cleanmu_200.*86400, mode = "line",name = "200"),
+        scatter(x = 0:1000, y = cleanmu_300.*86400, mode = "line",name = "300"),
+        scatter(x = 0:1000, y = cleanmu_400.*86400, mode = "line",name = "400"),
+        scatter(x = 0:1000, y = cleanmu_800.*86400, mode = "line",name = "800"),],
     Layout(title = "Mu profile $(time) h",
     xaxis_title = "Depth (µm)",
     yaxis_title = "mu (d-1)"))
