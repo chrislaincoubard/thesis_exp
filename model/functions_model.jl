@@ -80,8 +80,8 @@ function getdiagonals_ions(D, dz, dt, ind)
     diag = fill(1 + 2 * coefDiff, ind)
     up = fill(-coefDiff, ind-1)
     low = fill(-coefDiff, ind-1)
-    diag[1] = 1+coefDiff
-    diag[ind] = 1+3*coefDiff
+    diag[1] = 1+3*coefDiff
+    diag[ind] = 1+coefDiff
     return low, diag, up
 end
 
@@ -111,7 +111,7 @@ function computeB_ions(Phi, Phi_surf, D, dz, dt, S, ind)
     B[i] = Phi[i] + S[i] * dt
     # B[i] = Phi[i]
     end
-    B[ind] += 2 * dt * D * Phi_surf / dz^2
+    B[1] += 2 * dt * D * Phi_surf / dz^2
     return B
 end
 
@@ -149,14 +149,20 @@ function make_C(H2PO4, CO2, KI, KII, QI, QII, Kw)
     return Carr
 end
 
-function compute_pH(kI, kII, QI, QII, kw, CO2, NO3, H2PO4, ind)
+function compute_pH(kI, kII, QI, QII, kw, CO2, NO3, H2PO4, Na, K, ind)
     p = 2*QI
     q = 2*kI*kII
     r = 3*QI*QII
+    sol1, sol2, sol3 = [],[],[]
     for i in 1:ind
+        b = -(NO3[i] + H2PO4[i] - Na - K)
         b = -(NO3[i] + H2PO4[i])
         c = -(kI * CO2[i] + p*H2PO4[i] + kw)
         d = -(q * CO2[i] + r * H2PO4[i])
-        sol = solve_third_degree(d,c,b,1)
+        result = solve_third_degree(d,c,b,1)
+        push!(sol1,result[1])
+        push!(sol2, result[2])
+        push!(sol3,result[3])
     end
+    return sol1,sol2,sol3
 end

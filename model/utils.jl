@@ -27,5 +27,14 @@ function solve_third_degree(a, b, c, d)
     #solve H^3 + pH^2 + qH + r = 0
     poly = Polynomial([d, c, b, a])
     result = roots(poly)
-    real_roots = filter(isreal, roots)
+    return filter(isreal, result)
+end
+
+
+function pad_zeros(vec, size)
+    if length(vec) >= size
+        return
+    else
+        return vcat(vec, zeros(size-length(vec)))
+    end
 end

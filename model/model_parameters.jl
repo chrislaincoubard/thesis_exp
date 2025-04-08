@@ -32,25 +32,27 @@ end
     D_CO2 = 1.9e-9#coefficient de diffusion du CO2 assimilé à celui des ions bicarbonate
     O2sat = 0.274 #Valeur d'un milieu solide saturé en 02, assimilé au biofilm (mol/m3)
     H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
-    PP_CO2 = 4.4e-4 #partial pressure of CO2 in air (atm)
+    PP_CO2 = 4.2e-4 #partial pressure of CO2 in air (atm)
     CO2_surf = H_constant_CO2 * PP_CO2 * 1000 #(mol/m3)
     VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
     VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
-    ka1_co2 = 4.46e-7 #dissociation coefficient of CO2
-    ka2_co2 = 4.68e-11 #dissociation coefficient of HCO3-
+    KI = 4.47e-7 #dissociation coefficient of CO2
+    KII = 4.67e-11 #dissociation coefficient of HCO3-
     
 end
 
 @with_kw struct Ions_params @deftype Number
-    D_NO3 = 1.7e-9 #Diffusion coefficient of nitrate in water (m2/s)
-    D_H2PO4 = 0.846e-9 #Diffusion coefficient of phosphate ion in water (m2/s)
-    C_NO3 = 8.8 #Concentration de nitrate dans le milieu (mol/m3)
-    C_H2PO4 = 4.3e-1 #Concentration dans le milieu de culture (mol/m3)
-    ka1_h3po4 = 6.2e-8 #dissociation coefficient of H2PO4-
-    ka2_h3po4 = 4.8e-13 #dissociation coefficient of PO43-
-    kw = 1e-14
-    VN_X = -0.16
-    VP_X = -0.007
+    D_NO3 = 1.701e-9 #Diffusion coefficient of nitrate in water (m2/s)
+    D_H2PO4 = 7.159e-10 #Diffusion coefficient of phosphate ion in water (m2/s)
+    C_NO3 = 8.8 #Concentration de NO3-dans le milieu (mol/m3)
+    C_H2PO4 = 1.71 #Concentration de H2PO4- dans le milieu de culture (mol/m3)
+    C_Na = 8.8 #Concentration de Na+ dans le milieu (mol/m3)
+    C_K = 2.14 #Concentration de K+ le milieu de culture (mol/m3)
+    QI = 6.2e-8 #dissociation coefficient of H2PO4- into HPO42-
+    QII = 4.8e-13 #dissociation coefficient of HPO42- into PO43-
+    kw = 1e-14 #dissociation coefficient of H20
+    VN_X = -0.16 #Coefficient stoechiométrique de consommation de NO3- par rapport à la biomasse
+    VP_X = -0.007 #Coefficient stoechiométrique de consommation de H2PO42- par rapport à la biomasse
 
 end

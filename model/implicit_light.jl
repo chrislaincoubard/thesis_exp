@@ -19,7 +19,7 @@ tp = TimeParams()
 hmp = HanModelParams() 
 gp = GasesParams()
 ip = Ions_params()
-light_intensities = [50,100,200,300,400,800]
+light_intensities = [50]
 z = 1e-3
 nz = Int64(1e3)
 dz = z/nz
@@ -56,8 +56,6 @@ for I0 in light_intensities
     pop = zeros(nz)
     X0 = hmp.rho * dz
     O2, CO2, NO3, H2PO4 = zeros(nz), zeros(nz), zeros(nz), zeros(nz)
-    H1, H2 = zeros(nz), zeros(nz)
-    pH1, pH2 = zeros(nz), zeros(nz)
     pop[1:25] .= X0
     println("Start for $I0")
     #Starting time (2 loops to save data at specific time points)
@@ -99,22 +97,17 @@ for I0 in light_intensities
             CO2[1:length(BCO2)] .= BCO2
             NO3[1:length(BNO3)] .= BNO3
             H2PO4[1:length(BH2PO4)] .= BH2PO4
-            # B = make_B(NO3, H2PO4)
-            # C = make_C(H2PO4, CO2, gp.ka1_co2, gp.ka2_co2, ip.ka1_h3po4, ip.ka2_h3po4, ip.kw)
-            # for (i,(b, c)) in enumerate(zip(B,C))
-            #     h1,h2 = solve_quadratic(1,b,c)
-            #     H1[i] = h1
-            #     H2[i] = h2
-            #     # pH1[i] = -log(h1/1e-3)
-            #     # pH2[i] = -log(h2/1e-3)
-            # end
             
         end
+        ind = findfirst(x -> x == 0, pop) -1
+        sol_H = compute_pH(gp.KI, gp.KII, ip.QI, ip.QII, ip.kw, CO2, NO3, H2PO4, ip.C_Na, ip.C_K, ind)
+            # if i_inner == 1
+            #     if length(sol_pH) != 3
+            #     println((length(sol_pH)))
+            #     end
+            # end
+        H1, H2, H3 = pad_zeros(sol_H[1], nz), pad_zeros(sol_H[2], nz), pad_zeros(sol_H[3],nz)
         #Append dataframes for each hour of the simulation
-        # df_H[!,"H1_$time_step"] = copy(H1)
-        # df_H[!,"H2_$time_step"] = copy(H2)
-        # df_pH[!, "A_$time_step"] = copy(pH1)
-        # df_pH[!,"B_$time_step"] = copy(pH2)
         df_O2[!, "$time_step"] = copy(O2)
         df_CO2[!,"$time_step"] = copy(CO2)
         df_NO3[!, "$time_step"] = copy(NO3)
@@ -123,6 +116,9 @@ for I0 in light_intensities
         df_mu_gross[!, "$time_step"] = copy(µ_gross)
         df_R[!,"$time_step"] = copy(R)
         df_pop[!,"$time_step"] = copy(pop)
+        df_H[!,"A_$time_step"] = copy(H1)
+        df_H[!,"B_$time_step"] = copy(H2)
+        df_H[!,"C_$time_step"] = copy(H3)
     end
     #Export data in CSV format
     CSV.write(joinpath(save_path_data,filename_O2), df_O2)
@@ -135,6 +131,7 @@ for I0 in light_intensities
     CSV.write(joinpath(save_path_data, filename_pop), df_pop)
     # CSV.write(joinpath(save_path_data, filename_H), df_H)
     # CSV.write(joinpath(save_path_data, filename_pH), df_pH)
+    CSV.write(joinpath(save_path_data, filename_H), df_H)
 end
 end
 println("Done with calculation")
