@@ -18,63 +18,34 @@ end
 path = raw"C:\Users\Chrislain\Documents\Results\model_data_test"
 # path = raw"C:\Users\Chrislain\Documents\Results\tmp\model_data_test_2"
 
-# save_path_O2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_O2_plots")
-# save_path_CO2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_CO2_plots_tests")
-# save_path_N = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_N_plots")
-# save_path_P = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_P_plots")
-# # save_path_pH1 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph1")
-# # save_path_pH2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph2")
-# save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\tmp\plots\model_mu_test")
+save_path_O2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_O2_plots")
+save_path_CO2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_CO2_plots_tests")
+save_path_CO2_50 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_CO2_plots_tests_2")
+save_path_N = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_N_plots")
+save_path_P = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_P_plots")
+save_path_pH = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_pH_plots_v2")
+save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\plots_50\model_mu_test_2")
 
-save_path_O2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_3\model_O2_plots")
-save_path_CO2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_3\model_CO2_plots_tests")
-save_path_CO2_50 = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_3\model_CO2_plots_tests_2")
-save_path_N = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_3\model_N_plots")
-save_path_P = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_3\model_P_plots")
-# save_path_pH1 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph1")
-# save_path_pH2 = mkpath(raw"C:\Users\Chrislain\Documents\Results\tmp\plots\model_pH_plots\ph2")
-save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\plots_3\model_mu_test_2")
+# lights = zeros(168)
 
-light = zeros(168)
-
-computelight!(light, 100, 11650, 1e-6)
+# computelight!(lights, 100, 11650, 1e-6)
 
 dfs = dataframesfromdir(path)
 println(keys(dfs))
 
-# df_O2 = dfs["model_O2_200.csv"]
-# df_O2_100 = dfs["model_O2_100.csv"]
-df_O2_50 = dfs["model_O2_50.csv"]
-# df_CO2 = dfs["model_CO2_200.csv"]
-df_CO2_50 = dfs["model_CO2_50.csv"]
-# df_CO2_100 = dfs["model_CO2_100.csv"]
-# df_N = dfs["model_N_200.csv"]
-df_N_50 = dfs["model_N_50.csv"]
-# df_P = dfs["model_P_200.csv"]
-df_P_50 = dfs["model_P_50.csv"]
-# df_mu = dfs["model_mu_200.csv"]
-# df_pop_50 = dfs["model_pop_50.csv"]
-# df_pop_100 = dfs["model_pop_100.csv"]
-# df_pop_200 = dfs["model_pop_200.csv"]
-# df_pop_300 = dfs["model_pop_300.csv"]
-# df_pop_400 = dfs["model_pop_400.csv"]
-# df_pop_800 = dfs["model_pop_800.csv"]
+# df_CO2_50 = dfs["model_CO2_50.csv"]
+# df_O2_50 = dfs["model_O2_50.csv"]
+# df_N_50 = dfs["model_N_50.csv"]
+# df_P_50 = dfs["model_P_50.csv"]
+# df_mu_50 = dfs["model_mu_50.csv"]
+# df_pH_50 = dfs["model_pH_50.csv"]
 
-df_mu_50 = dfs["model_mu_50.csv"]
-# df_mu_100 = dfs["model_mu_100.csv"]
-# df_mu_200 = dfs["model_mu_200.csv"]
-# df_mu_300 = dfs["model_mu_300.csv"]
-# df_mu_400 = dfs["model_mu_400.csv"]
-# df_mu_800 = dfs["model_mu_800.csv"]
-
-# df_N_100 = dfs["model_N_100.csv"]
-# df_P_100 = dfs["model_P_100.csv"]
-
-# df_N_300 = dfs["model_N_300.csv"]
-# df_P_300 = dfs["model_P_300.csv"]
-
-# df_mu_gross_100 = dfs["model_mu_gross_100.csv"]
-# df_R_100 = dfs["model_R_100.csv"]
+df_CO2_200 = dfs["model_CO2_200.csv"]
+df_O2_200 = dfs["model_O2_200.csv"]
+df_N_200 = dfs["model_N_200.csv"]
+df_P_200 = dfs["model_P_200.csv"]
+df_mu_200 = dfs["model_mu_200.csv"]
+df_pH_200 = dfs["model_pH_200.csv"]
 
 # dfs_mu = [dfs["model_mu_50.csv"], dfs["model_mu_100.csv"], dfs["model_mu_200.csv"], dfs["model_mu_300.csv"], dfs["model_mu_400.csv"], dfs["model_mu_800.csv"]]
 # df_H = dfs["model_H_200.csv"]
@@ -99,19 +70,8 @@ function plot_O2(df_O2)
         # display(p)
         savefig(p, joinpath(save_path_O2, file_name_O2))
     end
+    println("done O2 plots")
 end
-# for time in names(df_CO2)
-#     filename_CO2 = "CO2_profile_$(time)_h.png"
-#     cleanCO2 = removezeros(df_CO2[!,time])
-#     p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
-#         Layout(title = "CO2 concentration profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "CO2 concentration mol/m3",
-#         xaxis_range = [0,325],
-#         yaxis_range = [-0.1,0.16]))
-#     # display(p)
-#     savefig(p, joinpath(save_path_CO2, filename_CO2))
-# end
 
 function plot_CO2(df_CO2)
     for time in names(df_CO2)
@@ -126,6 +86,7 @@ function plot_CO2(df_CO2)
         # display(p)
         savefig(p, joinpath(save_path_CO2_50, filename_CO2))
     end
+    println("done CO2 plots")
 end
 
 function plot_N(df_N)
@@ -138,6 +99,7 @@ function plot_N(df_N)
             yaxis_title = "NO3 concentration mol/m3"))
         savefig(p, joinpath(save_path_N, filename_N))
     end
+    println("done N plots")
 end
 
 function plot_P(df_P)
@@ -150,12 +112,37 @@ function plot_P(df_P)
             yaxis_title = "P concentration mol/m3"))
         savefig(p, joinpath(save_path_P, filename_P))
     end
+    println("done P plots")
 end
 
-plot_O2(df_O2_50)
+function plot_pH(df_pH)
+    for time in names(df_pH)
+        filename_pH = "pH_profile_$(time)_h.png"
+        cleanpH = removezeros(df_pH[!,time])
+        cleanC = removezeros(df_CO2_200[!,time])
+        p = plot(
+            [scatter(x = 0:1000, y= cleanpH, mode = "line"),
+            scatter(x = 0:1000, y = cleanC, mode = "line", yaxis = "y2")],
+            Layout(title = "Ph2 profile $(time) h",
+            xaxis_title = "Depth (µm)",
+            yaxis_title = "pH",
+            yaxis2=attr(title="CO2_concentration", overlaying="y", side="right")))
+        savefig(p, joinpath(save_path_pH, filename_pH))
+    end
+    println("done pH plots")
+end
+
+# plot_O2(df_O2_50)
 # plot_CO2(df_CO2_50)
-plot_N(df_N_50)
-plot_P(df_P_50)
+# plot_N(df_N_50)
+# plot_P(df_P_50)
+# plot_pH(df_pH_50)
+# plot_O2(df_O2_200)
+# plot_CO2(df_CO2_200)
+# plot_N(df_N_200)
+# plot_P(df_P_200)
+plot_pH(df_pH_200)
+
 
 # for time in names(df_pH1)
 #     filename_pH = "pH1_profile_$(time)_h.png"
@@ -213,46 +200,5 @@ plot_P(df_P_50)
 #     end
 # end
 
-# for time in names(df_N)
-#     filename_N = "ions_profile_$(time)_h.png"
-#     cleanN = removezeros(df_N_100[!,time])
-#     cleanP = removezeros(df_P_100[!,time])
-#     p = plot(
-#         [scatter(x = 0:1000, y= cleanN, mode = "line", name = "N"),
-#         scatter(x = 0:1000, y = cleanP, mode = "line", name = "P")],
-#         Layout(title = "NO3 concentration profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "NO3 concentration mol/m3"))
-#     if time == "168"
-#         display(p)
-#     end
-#     # savefig(p, joinpath(save_path_N, filename_N))
-# end
-
-# for time in names(df_N)
-#     if time == "168"
-#     filename = "Gases_profiles_$(time)_h.png"
-#     cleanO2 = removezeros(df_O2_100[!,time])
-#     cleanCO2 = removezeros(df_CO2_100[!,time])
-#     cleanmu = removezeros(df_mu_100[!,time])
-#     p = plot([
-#         scatter(x = 0:1000, y = cleanO2, mode = "line", name = "O2", line=attr(width = 3)),
-#         scatter(x = 0:1000, y = cleanCO2, mode = "line", name = "CO2", line=attr(width = 3)),
-#         scatter(x = 0:1000, y = cleanmu.*86400, mode = "line", name = "mu", line=attr(width = 3), yaxis = "y2")
-#     ],Layout(title = "Gases profiles $(time) h", xaxis_title = "Depths (µm)", yaxis_title = "Gases concentration (mM)",
-#     yaxis2 = attr(title="Growth rate (d<sup>-1</sup>)",overlaying="y", side="right"), font = attr(size = 16)))
-#     display(p)
-#     end
-# end
-
-# for time in names(df_pH2)
-#     filename_pH = "pH2_profile_$(time)_h.png"
-#     cleanN = removezeros(df_pH[!,time])
-#     p = plot(scatter(x = 0:1000, y= cleanN, mode = "line"),
-#         Layout(title = "Ph2 profile $(time) h",
-#         xaxis_title = "Depth (µm)",
-#         yaxis_title = "pH"))
-#     savefig(p, joinpath(save_path_pH2, filename_pH))
-# end
 
 println("End of script")

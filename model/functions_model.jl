@@ -149,17 +149,20 @@ function make_C(H2PO4, CO2, KI, KII, QI, QII, Kw)
     return Carr
 end
 
-function compute_pH(kI, kII, QI, QII, kw, CO2, NO3, H2PO4, Na, K, ind)
-    p = 2*QI
-    q = 2*kI*kII
-    r = 3*QI*QII
+function compute_H(kI, kII, QI, QII, kw, CO2, NO3,H2PO4, Na, K, ind)
+    nat_HPO4 = 0.43
+    PO4_v2 = QII * nat_HPO4
+    
     sol1, sol2, sol3 = [],[],[]
     for i in 1:ind
-        b = -(NO3[i] + H2PO4[i] - Na - K)
-        b = -(NO3[i] + H2PO4[i])
-        c = -(kI * CO2[i] + p*H2PO4[i] + kw)
-        d = -(q * CO2[i] + r * H2PO4[i])
-        result = solve_third_degree(d,c,b,1)
+        HCO3 = kI*CO2[i]
+        CO3 = kI*kII*CO2[i]
+        HPO4fromH2PO4 = QI*H2PO4[i]
+        PO4fromH2PO4 = QI*QII*H2PO4[i]
+        b = -(NO3[i] + H2PO4[i] - Na - K + 2*nat_HPO4)
+        c = -( HCO3+ 2*HPO4fromH2PO4 + kw + 3*PO4_v2)
+        d = -(2*CO3 + 3*PO4fromH2PO4)
+        result = solve_third_degree(1,b,c,d)
         push!(sol1,result[1])
         push!(sol2, result[2])
         push!(sol3,result[3])

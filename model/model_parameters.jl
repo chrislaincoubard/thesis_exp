@@ -34,7 +34,7 @@ end
     H_constant_CO2 = 3.4e-2 #Henry's constant for CO2 in water at 25°C (mol/L/atm)
     PP_CO2 = 4.2e-4 #partial pressure of CO2 in air (atm)
     CO2_surf = H_constant_CO2 * PP_CO2 * 1000 #(mol/m3)
-    VO2_x = 1.125 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
+    VO2_x = 1.142 #Coefficient stoechiométrique de production d'O2 par rapport à la biomasse
     VCO2_x = -1 #Coefficient stoechiométrique de consommation du CO2 par rapport à la biomasse
     Mx = 0.024 # C-masse molaire de la biomasse (kgx/C-mol)
     KI = 4.47e-7 #dissociation coefficient of CO2
@@ -46,13 +46,13 @@ end
     D_NO3 = 1.701e-9 #Diffusion coefficient of nitrate in water (m2/s)
     D_H2PO4 = 7.159e-10 #Diffusion coefficient of phosphate ion in water (m2/s)
     C_NO3 = 8.8 #Concentration de NO3-dans le milieu (mol/m3)
-    C_H2PO4 = 1.71 #Concentration de H2PO4- dans le milieu de culture (mol/m3)
+    C_H2PO4 = 1.28 #Concentration de H2PO4- dans le milieu de culture (mol/m3)
     C_Na = 8.8 #Concentration de Na+ dans le milieu (mol/m3)
     C_K = 2.14 #Concentration de K+ le milieu de culture (mol/m3)
     QI = 6.2e-8 #dissociation coefficient of H2PO4- into HPO42-
     QII = 4.8e-13 #dissociation coefficient of HPO42- into PO43-
     kw = 1e-14 #dissociation coefficient of H20
-    VN_X = -0.16 #Coefficient stoechiométrique de consommation de NO3- par rapport à la biomasse
-    VP_X = -0.007 #Coefficient stoechiométrique de consommation de H2PO42- par rapport à la biomasse
+    VN_X = -0.15 #Coefficient stoechiométrique de consommation de NO3- par rapport à la biomasse
+    VP_X = -0.009 #Coefficient stoechiométrique de consommation de H2PO42- par rapport à la biomasse
 
 end
