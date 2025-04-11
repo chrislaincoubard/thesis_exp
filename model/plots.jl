@@ -26,26 +26,27 @@ save_path_P = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_P_p
 save_path_pH = mkpath(raw"C:\Users\Chrislain\Documents\Results\plots_50\model_pH_plots_v2")
 save_path_mu = mkpath(raw"c:\\Users\Chrislain\Documents\Results\plots_50\model_mu_test_2")
 
-# lights = zeros(168)
+light = zeros(168)
 
-# computelight!(lights, 100, 11650, 1e-6)
+computelight!(light, 100, 11650, 1e-6)
 
 dfs = dataframesfromdir(path)
 println(keys(dfs))
 
-# df_CO2_50 = dfs["model_CO2_50.csv"]
-# df_O2_50 = dfs["model_O2_50.csv"]
-# df_N_50 = dfs["model_N_50.csv"]
-# df_P_50 = dfs["model_P_50.csv"]
-# df_mu_50 = dfs["model_mu_50.csv"]
-# df_pH_50 = dfs["model_pH_50.csv"]
-
-df_CO2_200 = dfs["model_CO2_200.csv"]
-df_O2_200 = dfs["model_O2_200.csv"]
-df_N_200 = dfs["model_N_200.csv"]
-df_P_200 = dfs["model_P_200.csv"]
-df_mu_200 = dfs["model_mu_200.csv"]
-df_pH_200 = dfs["model_pH_200.csv"]
+df_CO2_50 = dfs["model_CO2_50.csv"]
+df_O2_50 = dfs["model_O2_50.csv"]
+df_N_50 = dfs["model_N_50.csv"]
+df_P_50 = dfs["model_P_50.csv"]
+df_mu_50 = dfs["model_mu_50.csv"]
+df_pH_50 = dfs["model_pH_50.csv"]
+df_mu_gross_50 = dfs["model_mu_gross_50.csv"]
+df_R_50 = dfs["model_R_50.csv"]
+# df_CO2_200 = dfs["model_CO2_200.csv"]
+# df_O2_200 = dfs["model_O2_200.csv"]
+# df_N_200 = dfs["model_N_200.csv"]
+# df_P_200 = dfs["model_P_200.csv"]
+# df_mu_200 = dfs["model_mu_200.csv"]
+# df_pH_200 = dfs["model_pH_200.csv"]
 
 # dfs_mu = [dfs["model_mu_50.csv"], dfs["model_mu_100.csv"], dfs["model_mu_200.csv"], dfs["model_mu_300.csv"], dfs["model_mu_400.csv"], dfs["model_mu_800.csv"]]
 # df_H = dfs["model_H_200.csv"]
@@ -62,11 +63,11 @@ function plot_O2(df_O2)
         file_name_O2 = "O2_profile_$(time)_h.png"
         cleanO2 = removezeros(df_O2[!,time])
         p = plot([scatter(x = 0:1000, y = cleanO2, mode = "line", name = "O2")], 
-            Layout(title = "02 concentration profile for 200 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
+            Layout(title = "02 concentration profile for 50 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
             xaxis_title = "Depth (µm)",
             yaxis_title = "O2 concentration mol/m<sup>3</sup>",
-            xaxis_range = [0,325],
-            yaxis_range = [0.25,0.45]))
+            xaxis_range = [0,100],
+            yaxis_range = [0.25,0.3]))
         # display(p)
         savefig(p, joinpath(save_path_O2, file_name_O2))
     end
@@ -78,11 +79,11 @@ function plot_CO2(df_CO2)
         filename_CO2 = "CO2_profile_$(time)_h.png"
         cleanCO2 = removezeros(df_CO2[!,time])
         p = plot(scatter(x = 0:1000, y= cleanCO2, mode = "line"),
-            Layout(title = "CO2 concentration profile $(time) h",
+            Layout(title = "CO2 concentration profile for 50 µmol<sub>photons</sup>/m<sup>2</sup>/s after $(time) hours",
             xaxis_title = "Depth (µm)",
             yaxis_title = "CO2 concentration mol/m3",
-            xaxis_range = [0,325],
-            yaxis_range = [-0.1,0.16]))
+            xaxis_range = [0,100],
+            yaxis_range = [0,0.05]))
         # display(p)
         savefig(p, joinpath(save_path_CO2_50, filename_CO2))
     end
@@ -119,14 +120,11 @@ function plot_pH(df_pH)
     for time in names(df_pH)
         filename_pH = "pH_profile_$(time)_h.png"
         cleanpH = removezeros(df_pH[!,time])
-        cleanC = removezeros(df_CO2_200[!,time])
         p = plot(
-            [scatter(x = 0:1000, y= cleanpH, mode = "line"),
-            scatter(x = 0:1000, y = cleanC, mode = "line", yaxis = "y2")],
+            scatter(x = 0:100, y= cleanpH, mode = "line"),
             Layout(title = "Ph2 profile $(time) h",
             xaxis_title = "Depth (µm)",
-            yaxis_title = "pH",
-            yaxis2=attr(title="CO2_concentration", overlaying="y", side="right")))
+            yaxis_title = "pH"))
         savefig(p, joinpath(save_path_pH, filename_pH))
     end
     println("done pH plots")
@@ -136,12 +134,12 @@ end
 # plot_CO2(df_CO2_50)
 # plot_N(df_N_50)
 # plot_P(df_P_50)
-# plot_pH(df_pH_50)
+plot_pH(df_pH_50)
 # plot_O2(df_O2_200)
 # plot_CO2(df_CO2_200)
 # plot_N(df_N_200)
 # plot_P(df_P_200)
-plot_pH(df_pH_200)
+# plot_pH(df_pH_200)
 
 
 # for time in names(df_pH1)
@@ -179,26 +177,26 @@ plot_pH(df_pH_200)
 #     end
 # end
 
-# for time in names(df_mu)
-#     filename = "mu_details_$(time)_h.png"
-#     clean_net_mu = removezeros(df_mu_100[!,"$time"])
-#     clean_gross_mu = removezeros(df_mu_gross_100[!,"$time"])
-#     clean_R = removezeros(df_R_100[!,"$time"])
-#     p = plot([
-#         scatter( x = 0:length(clean_net_mu), y = clean_net_mu.*86400, mode = "line", line = attr(width = 3), name = "Net µ"),
-#         scatter( x = 0:length(clean_gross_mu), y = clean_gross_mu.*86400, mode = "line", line = attr(width = 3), name = "Gross µ"),
-#         scatter( x = 0:length(clean_R), y = clean_R.*86400, mode = "line", line = attr(width = 3), name = "Respiration"),
-#         scatter( x = 0:length(clean_net_mu), y = light, mode = "line", line = attr(dash = "dash", color = "black"), name = "light intensity",yaxis = "y2")],
-#         Layout(title = "Growth rate details : 7 days, light 100 µmol<sub>photons</sup>/m<sup>2</sup>/s",
-#         yaxis_title = "Growth and respiration rates (d<sup>-1</sup>)",
-#         xaxis_title = "Depths (µm)",
-#         yaxis2=attr(
-#             title="Light intensity<br>(µmol<sub>photons</sup>/m<sup>2</sup>/s)",
-#             overlaying="y", side="right")))
-#     if time == "168"
-#         display(p)
-#     end
-# end
+for time in names(df_mu_50)
+    filename = "mu_details_$(time)_h.png"
+    clean_net_mu = removezeros(df_mu_50[!,"$time"])
+    clean_gross_mu = removezeros(df_mu_gross_50[!,"$time"])
+    clean_R = removezeros(df_R_50[!,"$time"])
+    p = plot([
+        scatter( x = 0:length(clean_net_mu), y = clean_net_mu.*86400, mode = "line", line = attr(width = 3), name = "Net µ"),
+        scatter( x = 0:length(clean_gross_mu), y = clean_gross_mu.*86400, mode = "line", line = attr(width = 3), name = "Gross µ"),
+        scatter( x = 0:length(clean_R), y = clean_R.*86400, mode = "line", line = attr(width = 3), name = "Respiration"),
+        scatter( x = 0:length(clean_net_mu), y = light, mode = "line", line = attr(dash = "dash", color = "black"), name = "light intensity",yaxis = "y2")],
+        Layout(title = "Growth rate details : 7 days, light 50 µmol<sub>photons</sup>/m<sup>2</sup>/s",
+        yaxis_title = "Growth and respiration rates (d<sup>-1</sup>)",
+        xaxis_title = "Depths (µm)",
+        yaxis2=attr(
+            title="Light intensity<br>(µmol<sub>photons</sup>/m<sup>2</sup>/s)",
+            overlaying="y", side="right")))
+    if time == "168"
+        display(p)
+    end
+end
 
 
 println("End of script")
